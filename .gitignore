@@ -1,0 +1,10 @@
+# Dossiers et fichiers à ignorer par Git
+
+# Environnement Virtuel Python
+venv/
+
+# Fichiers binaires temporaires de Python
+__pycache__
+
+# Dépendances Frontend (Node.js/React)
+node_modules/
