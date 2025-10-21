@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+
+  # 1. Base de Données NoSQL (MongoDB) pour stocker les données de marché
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_db
+    ports:
+      - "27017:27017" # Le port local est mappé au port du conteneur
+    environment:
+      # Définition des identifiants (utilisés par l'application collector/backend)
+      MONGO_INITDB_ROOT_USERNAME: user_crypto
+      MONGO_INITDB_ROOT_PASSWORD: secret_password
+    volumes:
+      - mongodb_data:/data/db # Volume pour assurer la persistance des données
+
+  # 2. Broker de messages (RabbitMQ) pour le Scheduler Celery
+  rabbitmq:
+    image: rabbitmq:3-management # Version avec l'interface de gestion web
+    container_name: rabbitmq_broker
+    ports:
+      - "5672:5672"   # Port standard pour la connexion Celery
+      - "15672:15672" # Port pour l'interface de gestion web (accessible via http://localhost:15672)
+    environment:
+      RABBITMQ_DEFAULT_USER: user_mq
+      RABBITMQ_DEFAULT_PASS: secret_mq_password
+
+# Définition du volume de données
+volumes:
+  mongodb_data:
