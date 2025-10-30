@@ -1,6 +1,6 @@
-# 🪙 Cryptocurrency Monitoring Platform
+#  Cryptocurrency Monitoring Platform
 
-## 🎯 Objectif du projet
+##  Objectif du projet
 Créer une plateforme complète de **surveillance, d’analyse et de prévision** du marché des cryptomonnaies.  
 Le projet comprend :
 - Un **collecteur** de données (application Python) qui récupère les prix, volumes et capitalisations depuis une API publique (ex : CoinCap).  
@@ -9,7 +9,7 @@ Le projet comprend :
 
 ---
 
-## ⚙️ Architecture prévue
+##  Architecture prévue
 collector (Python)
 ↓
 MongoDB (base de données)
@@ -23,7 +23,7 @@ Chaque composant sera **conteneurisé avec Docker** et connecté via `docker-com
 
 ---
 
-## 🧰 Technologies utilisées
+##  Technologies utilisées
 | Composant | Technologie |
 |------------|--------------|
 | Langage principal | Python 3 |
@@ -36,7 +36,7 @@ Chaque composant sera **conteneurisé avec Docker** et connecté via `docker-com
 
 ---
 
-## 🚀 Démarrage rapide
+##  Démarrage rapide
 ```bash
 # Cloner le projet
 git clone https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform.git
@@ -44,7 +44,7 @@ git clone https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-pl
 # Lancer les services Docker
 docker compose up
 
-##Auteurs
+#Auteurs
 
 Souhila Aicha Kebdani
 Projet académique – Master 2 ILSEN (2025)
