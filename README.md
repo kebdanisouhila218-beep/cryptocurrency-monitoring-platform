@@ -11,11 +11,11 @@ Le projet comprend :
 
 ##  Architecture prévue
 collector (Python)
-↓
+->
 MongoDB (base de données)
-↓
+->
 backend API (FastAPI)
-↓
+->
 frontend (React / Streamlit)
 
 
