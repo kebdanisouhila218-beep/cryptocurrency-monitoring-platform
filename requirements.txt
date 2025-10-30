@@ -1,0 +1,9 @@
+requests
+pymongo
+pytest
+python-dotenv
+schedule
+fastapi
+uvicorn
+bcrypt
+python-jose
