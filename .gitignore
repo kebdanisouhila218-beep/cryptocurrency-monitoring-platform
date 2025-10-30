@@ -1,10 +1,42 @@
-# Dossiers et fichiers à ignorer par Git
-
-# Environnement Virtuel Python
+# ----------------------------
+# ENVIRONNEMENT PYTHON
+# ----------------------------
 venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Fichiers binaires temporaires de Python
-__pycache__
-
-# Dépendances Frontend (Node.js/React)
+# ----------------------------
+# DEPENDANCES FRONTEND (React)
+# ----------------------------
 node_modules/
+dist/
+build/
+
+# ----------------------------
+# LOGS ET FICHIERS TEMPORAIRES
+# ----------------------------
+*.log
+*.tmp
+*.swp
+*.swo
+
+# ----------------------------
+# CONFIGURATION IDE (VS Code, PyCharm)
+# ----------------------------
+.vscode/
+.idea/
+
+# ----------------------------
+# DOCKER
+# ----------------------------
+*.pid
+docker-compose.override.yml
+
+# ----------------------------
+# AUTRES FICHIERS DU SYSTÈME
+# ----------------------------
+.DS_Store
+Thumbs.db
