@@ -1,9 +1,4 @@
-requests
-pymongo
-pytest
-python-dotenv
-schedule
-fastapi
-uvicorn
-bcrypt
-python-jose
+requests==2.32.3
+pymongo==4.10.1
+pytest==8.3.2
+python-dotenv==1.0.1
