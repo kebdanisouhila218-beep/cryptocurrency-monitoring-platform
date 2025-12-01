@@ -1,30 +1,50 @@
 version: '3.8'
+
 services:
-
-  # 1. Base de Données NoSQL (MongoDB) pour stocker les données de marché
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb_db
+  mongo:
+    image: mongo:6
+    container_name: mongo
     ports:
-      - "27017:27017" # Le port local est mappé au port du conteneur
-    environment:
-      # Définition des identifiants (utilisés par l'application collector/backend)
-      MONGO_INITDB_ROOT_USERNAME: user_crypto
-      MONGO_INITDB_ROOT_PASSWORD: secret_password
+      - "27017:27017"
     volumes:
-      - mongodb_data:/data/db # Volume pour assurer la persistance des données
+      - mongodb_data:/data/db
 
-  # 2. Broker de messages (RabbitMQ) pour le Scheduler Celery
-  rabbitmq:
-    image: rabbitmq:3-management # Version avec l'interface de gestion web
-    container_name: rabbitmq_broker
+  collector-test:
+    build: ./collector
+    container_name: collector-test
+    depends_on:
+      - mongo
+    command: ["python", "collector.py", "test"]
+
+  api:
+    build: ./api
+    container_name: fastapi
     ports:
-      - "5672:5672"   # Port standard pour la connexion Celery
-      - "15672:15672" # Port pour l'interface de gestion web (accessible via http://localhost:15672)
-    environment:
-      RABBITMQ_DEFAULT_USER: user_mq
-      RABBITMQ_DEFAULT_PASS: secret_mq_password
+      - "8000:8000"
+    depends_on:
+      - mongo
 
-# Définition du volume de données
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  scheduler:
+    build: ./collector
+    container_name: scheduler
+    command: celery -A tasks beat --loglevel=info
+    depends_on:
+      - mongo
+      - redis
+
+  worker:
+    build: ./collector
+    container_name: worker
+    command: celery -A tasks worker --loglevel=info
+    depends_on:
+      - mongo
+      - redis
+
 volumes:
   mongodb_data:
