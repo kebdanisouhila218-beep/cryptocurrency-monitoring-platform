@@ -1,21 +1,35 @@
-name: Test Intégration - Collector
+name: Integration Test - Collector
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  test-collector-integration:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Lancer MongoDB et exécuter le test
+      - name: Set up Docker Compose
+        uses: docker/setup-compose@v3
+
+      - name: Start MongoDB via Docker Compose
         run: |
           docker-compose up -d mongo
           sleep 10
-          docker-compose run --rm ci-test-collector
 
-      - name: Nettoyer
+      - name: Run integration test in the same Docker network
+        run: |
+          docker run --network cryptocurrency-monitoring-platform_default \
+                     --volume "$(pwd)/collector:/app" \
+                     --workdir /app \
+                     python:3.11-slim \
+                     sh -c "
+                       pip install pytest pymongo requests &&
+                       python -m pytest test_integration_collector.py -v
+                     "
+
+      - name: Cleanup
         if: always()
         run: |
           docker-compose down -v
