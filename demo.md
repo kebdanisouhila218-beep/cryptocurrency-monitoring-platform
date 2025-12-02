@@ -21,10 +21,18 @@ curl http://localhost:8000/prices
 docker-compose up --build collector-test
 
 # Tests unitaires API
-cd api && pytest test_api.py -v
+docker-compose run --rm test-unit-api
 
 # Tests d'intégration
 docker-compose run --rm test-integration 
+
+# Lancer SERVEUR 
+cd api
+>> uvicorn main:app --reload
+
+
+http://127.0.0.1:8000/
+
 
 
 **Discours pour le prof :**

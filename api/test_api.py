@@ -20,7 +20,7 @@ def test_root():
     client = TestClient(app)
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json()["message"] == "🚀 API Crypto fonctionnelle !"
+    assert response.json()["message"] == "✅ API Crypto fonctionnelle !"
 
 def test_prices():
     # Mock MongoDB
