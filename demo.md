@@ -34,6 +34,11 @@ cd api
 http://127.0.0.1:8000/
 
 
+PS C:\Users\etudiant\Documents\GitHub\cryptocurrency-monitoring-platform\api> uvicorn main:app --reload   ( terminal)
+
+(.venv) PS C:\Users\etudiant\Documents\GitHub\cryptocurrency-monitoring-platform\frontend> npm start (vs)
+
+http://localhost:3000/
 
 **Discours pour le prof :**
 > "J'ai implémenté la partie collecte de données avec une architecture microservices. Le collector récupère les données de CoinPaprika, les stocke dans MongoDB, et l'API FastAPI les expose. J'ai mis en place des tests unitaires et d'intégration, plus un pipeline CI/CD avec GitHub Actions qui valide automatiquement les 3 workflows de tests."
