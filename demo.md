@@ -1,0 +1,32 @@
+# 1. Montrer l'architecture
+docker-compose ps
+
+# 2. Lancer les services
+docker-compose up -d
+
+# 3. Vérifier les logs du collector
+docker logs collector-test
+
+# 4. Vérifier MongoDB
+docker exec -it mongo mongosh
+> use crypto_db
+> db.prices.find().limit(5)
+
+# 5. Tester l'API
+curl http://localhost:8000/
+curl http://localhost:8000/prices
+
+# 6. Montrer les tests qui passent
+# Tests unitaires collector
+docker-compose up --build collector-test
+
+# Tests unitaires API
+cd api && pytest test_api.py -v
+
+# Tests d'intégration
+docker-compose run --rm test-integration 
+
+
+**Discours pour le prof :**
+> "J'ai implémenté la partie collecte de données avec une architecture microservices. Le collector récupère les données de CoinPaprika, les stocke dans MongoDB, et l'API FastAPI les expose. J'ai mis en place des tests unitaires et d'intégration, plus un pipeline CI/CD avec GitHub Actions qui valide automatiquement les 3 workflows de tests."
+

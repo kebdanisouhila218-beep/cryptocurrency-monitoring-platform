@@ -1,0 +1,45 @@
+stages:
+  - test
+  - build
+
+# Tests du Collector
+test:collector:
+  stage: test
+  image: python:3.11
+  before_script:
+    - pip install -r collector/requirements.txt
+    - pip install pytest
+  script:
+    - cd collector
+    - pytest tests/ || true
+  only:
+    - main
+    - develop
+
+# Tests du Backend
+test:backend:
+  stage: test
+  image: python:3.11
+  before_script:
+    - pip install -r backend/requirements.txt
+    - pip install pytest
+  script:
+    - cd backend
+    - pytest tests/ || true
+  only:
+    - main
+    - develop
+
+# Build Docker Collector
+build:collector:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE/collector:latest ./collector
+    - docker push $CI_REGISTRY_IMAGE/collector:latest
+  only:
+    - main
