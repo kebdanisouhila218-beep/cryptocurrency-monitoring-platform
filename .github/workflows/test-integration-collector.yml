@@ -10,9 +10,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Compose
-        uses: docker/setup-compose@v3
-
       - name: Start MongoDB via Docker Compose
         run: |
           docker-compose up -d mongo
