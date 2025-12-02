@@ -10,12 +10,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Start MongoDB via Docker Compose
+      - name: Start MongoDB
         run: |
-          docker-compose up -d mongo
+          docker compose up -d mongo
           sleep 10
 
-      - name: Run integration test in the same Docker network
+      - name: Run integration test
         run: |
           docker run --network cryptocurrency-monitoring-platform_default \
                      --volume "$(pwd)/collector:/app" \
@@ -29,4 +29,4 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker-compose down -v
+          docker compose down -v
