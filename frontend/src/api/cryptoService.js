@@ -2,14 +2,13 @@
 
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'http://127.0.0.1:8000';
 
 const cryptoService = {
-  // Récupérer toutes les cryptos (depuis /prices)
+  // Récupérer toutes les cryptos
   getAllCryptos: async () => {
     try {
       const response = await axios.get(`${API_BASE}/prices`);
-      // Transformer les données du format /prices
       return response.data.prices || [];
     } catch (error) {
       console.error('Erreur lors de la récupération des cryptos:', error);
@@ -17,13 +16,12 @@ const cryptoService = {
     }
   },
 
-  // Récupérer une crypto spécifique (filtrée depuis /prices)
+  // Récupérer une crypto spécifique
   getCryptoByName: async (name) => {
     try {
       const response = await axios.get(`${API_BASE}/prices`);
       const prices = response.data.prices || [];
       
-      // Filtrer pour trouver la crypto
       const crypto = prices.find(p => 
         p.name?.toLowerCase().includes(name.toLowerCase()) || 
         p.symbol?.toLowerCase().includes(name.toLowerCase())
@@ -35,7 +33,7 @@ const cryptoService = {
       
       return crypto;
     } catch (error) {
-      console.error(`Erreur lors de la récupération de ${name}:`, error);
+      console.error(`Erreur: ${error.message}`);
       throw error;
     }
   },
@@ -46,7 +44,6 @@ const cryptoService = {
       const response = await axios.get(`${API_BASE}/prices`);
       const prices = response.data.prices || [];
       
-      // Filtrer et limiter aux N derniers jours
       const history = prices
         .filter(p => 
           p.name?.toLowerCase().includes(name.toLowerCase()) || 
@@ -60,7 +57,7 @@ const cryptoService = {
       
       return history;
     } catch (error) {
-      console.error(`Erreur lors de la récupération de l'historique:`, error);
+      console.error(`Erreur: ${error.message}`);
       throw error;
     }
   }

@@ -10,9 +10,7 @@ const Dashboard = () => {
   const [selectedCrypto, setSelectedCrypto] = useState('bitcoin');
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [days, setDays] = useState(7);
 
-  // Charger les cryptos
   useEffect(() => {
     fetchCryptos();
   }, []);
@@ -21,72 +19,68 @@ const Dashboard = () => {
     try {
       const data = await cryptoService.getAllCryptos();
       setCryptos(data);
+      if (data.length > 0) {
+        setSelectedCrypto(data[0].name?.toLowerCase() || 'bitcoin');
+      }
     } catch (error) {
       console.error('Erreur:', error);
     }
   };
 
-  // Charger l'historique d'une crypto
   useEffect(() => {
     if (selectedCrypto) {
       fetchHistory();
     }
-  }, [selectedCrypto, days]);
+  }, [selectedCrypto]);
 
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const data = await cryptoService.getCryptoHistory(selectedCrypto, days);
+      const data = await cryptoService.getCryptoHistory(selectedCrypto, 7);
       setHistory(data);
     } catch (error) {
       console.error('Erreur:', error);
+      setHistory([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Calculer les statistiques
   const stats = {
-    totalMarketCap: cryptos.reduce((sum, c) => sum + (c.market_cap || 0), 0),
-    avgPrice: cryptos.length > 0 ? cryptos.reduce((sum, c) => sum + c.price_usd, 0) / cryptos.length : 0,
-    topGainer: cryptos.length > 0 ? cryptos.reduce((prev, curr) => (prev.change_24h > curr.change_24h ? prev : curr)) : null,
+    totalCryptos: cryptos.length,
+    avgPrice: cryptos.length > 0 ? cryptos.reduce((sum, c) => sum + (c.price_usd || 0), 0) / cryptos.length : 0,
+    totalVolume: cryptos.reduce((sum, c) => sum + (c.volume_24h || 0), 0),
   };
 
-  // Données pour le graphique des prix
-  const priceData = history.length > 0 ? history.map(h => ({
-    date: new Date(h.timestamp).toLocaleDateString('fr-FR'),
-    price: h.price_usd,
-  })) : [];
-
-  // Données pour le graphique des volumes
   const volumeData = cryptos.slice(0, 10).map(c => ({
     name: c.symbol,
-    volume: c.volume_24h / 1e9,
+    volume: (c.volume_24h || 0) / 1e9,
+  }));
+
+  const priceData = history.map((h, idx) => ({
+    date: `Jour ${idx + 1}`,
+    price: h.price_usd || 0,
   }));
 
   return (
     <div className="dashboard-container">
       <h1>📊 Dashboard Crypto</h1>
 
-      {/* Cartes de statistiques */}
       <div className="stats-grid">
         <div className="stat-card">
-          <h3>💼 Capitalisation Totale</h3>
-          <p className="stat-value">${(stats.totalMarketCap / 1e9).toFixed(2)}B</p>
+          <h3>📊 Total Cryptos</h3>
+          <p className="stat-value">{stats.totalCryptos}</p>
         </div>
         <div className="stat-card">
-          <h3>📈 Prix Moyen</h3>
+          <h3>📈 Prix Moyen USD</h3>
           <p className="stat-value">${stats.avgPrice.toFixed(2)}</p>
         </div>
         <div className="stat-card">
-          <h3>🚀 Top Gainer (24h)</h3>
-          <p className="stat-value">
-            {stats.topGainer ? `${stats.topGainer.symbol} +${stats.topGainer.change_24h.toFixed(2)}%` : 'N/A'}
-          </p>
+          <h3>💰 Volume Total 24h</h3>
+          <p className="stat-value">${(stats.totalVolume / 1e9).toFixed(2)}B</p>
         </div>
       </div>
 
-      {/* Sélection de la crypto */}
       <div className="control-panel">
         <div className="control-group">
           <label htmlFor="crypto-select">Sélectionner une crypto:</label>
@@ -95,33 +89,18 @@ const Dashboard = () => {
             value={selectedCrypto} 
             onChange={(e) => setSelectedCrypto(e.target.value)}
           >
-            {cryptos.map(crypto => (
-              <option key={crypto._id} value={crypto.name.toLowerCase()}>
+            {cryptos.map((crypto, idx) => (
+              <option key={idx} value={crypto.name?.toLowerCase() || ''}>
                 {crypto.name} ({crypto.symbol})
               </option>
             ))}
           </select>
         </div>
-
-        <div className="control-group">
-          <label htmlFor="days-select">Période:</label>
-          <select 
-            id="days-select"
-            value={days} 
-            onChange={(e) => setDays(parseInt(e.target.value))}
-          >
-            <option value={7}>7 jours</option>
-            <option value={30}>30 jours</option>
-            <option value={90}>90 jours</option>
-          </select>
-        </div>
       </div>
 
-      {/* Graphiques */}
       <div className="charts-grid">
-        {/* Graphique des prix */}
         <div className="chart-container">
-          <h3>📈 Historique des Prix ({selectedCrypto})</h3>
+          <h3>📈 Prix ({selectedCrypto})</h3>
           {loading ? (
             <p className="loading">⏳ Chargement...</p>
           ) : priceData.length > 0 ? (
@@ -130,7 +109,7 @@ const Dashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                <Tooltip formatter={(value) => `$${value.toFixed(6)}`} />
                 <Legend />
                 <Line 
                   type="monotone" 
@@ -146,7 +125,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Graphique des volumes */}
         <div className="chart-container">
           <h3>📊 Top 10 Volumes 24h</h3>
           {volumeData.length > 0 ? (

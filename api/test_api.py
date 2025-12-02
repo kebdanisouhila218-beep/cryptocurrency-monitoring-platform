@@ -16,12 +16,13 @@ MOCK_PRICES = [
     }
 ]
 
-def test_root():
+def test_root_returns_html():
     client = TestClient(app)
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json()["message"] == "✅ API Crypto fonctionnelle !"
-
+    assert "Crypto Tracker" in response.text
+    assert response.headers["content-type"] == "text/html; charset=utf-8"
+    
 def test_prices():
     # Mock MongoDB
     mock_collection = Mock()
