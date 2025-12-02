@@ -1,24 +1,21 @@
-name: Integration Test - Collector
+name: Test Intégration - Collector
 
 on: [push, pull_request]
 
 jobs:
-  test-collector-integration:
+  test:
     runs-on: ubuntu-latest
-    services:
-      mongo:
-        image: mongo:6
-        ports:
-          - 27017:27017
     steps:
-      - uses: actions/checkout@v4
-      - name: Run integration test
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lancer MongoDB et exécuter le test
         run: |
-          docker build -t test-collector -f - . <<EOF
-          FROM python:3.11-slim
-          WORKDIR /app
-          COPY collector/ /app/
-          RUN pip install pytest pymongo requests
-          CMD ["pytest", "test_integration_collector.py", "-v"]
-          EOF
-          docker run --network host test-collector
+          docker-compose up -d mongo
+          sleep 10
+          docker-compose run --rm ci-test-collector
+
+      - name: Nettoyer
+        if: always()
+        run: |
+          docker-compose down -v

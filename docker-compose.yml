@@ -62,11 +62,23 @@ services:
         pip install pytest pymongo requests &&
         # Attendre que MongoDB soit prêt
         until curl -f http://mongo:27017/ 2>/dev/null; do
-          echo '⏳ En attente de MongoDB...' && sleep 2;
+          echo ' En attente de MongoDB...' && sleep 2;
         done &&
-        echo '✅ MongoDB prêt. Lancement des tests...' &&
+        echo ' MongoDB prêt. Lancement des tests...' &&
         python -m pytest test_integration_collector.py -v
       "
-
+  ci-test-collector:
+    build: ./collector
+    volumes:
+      - ./collector:/app
+    working_dir: /app
+    depends_on:
+      - mongo
+    command: >
+      sh -c "
+        pip install pytest pymongo requests &&
+        until timeout 1 curl -f http://mongo:27017/ 2>/dev/null; do sleep 1; done &&
+        python -m pytest test_integration_collector.py -v
+      "
 volumes:
   mongodb_data:
