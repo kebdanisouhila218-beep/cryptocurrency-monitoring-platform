@@ -1,3 +1,16 @@
+Python 3.11
+FastAPI
+MongoDB
+Redis + Celery
+React
+Docker
+
+**Architecture en 3 couches :**
+1. **Collecte** : Le collector récupère les données toutes les minutes
+2. **Stockage** : MongoDB garde l'historique des prix
+3. **Présentation** : API REST + Interface React avec graphiques
+
+
 # 1. Montrer l'architecture
 docker-compose ps
 
@@ -39,7 +52,4 @@ PS C:\Users\etudiant\Documents\GitHub\cryptocurrency-monitoring-platform\api> uv
 (.venv) PS C:\Users\etudiant\Documents\GitHub\cryptocurrency-monitoring-platform\frontend> npm start (vs)
 
 http://localhost:3000/
-
-**Discours pour le prof :**
-> "J'ai implémenté la partie collecte de données avec une architecture microservices. Le collector récupère les données de CoinPaprika, les stocke dans MongoDB, et l'API FastAPI les expose. J'ai mis en place des tests unitaires et d'intégration, plus un pipeline CI/CD avec GitHub Actions qui valide automatiquement les 3 workflows de tests."
 
