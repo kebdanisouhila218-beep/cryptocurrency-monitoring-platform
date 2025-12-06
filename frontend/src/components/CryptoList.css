@@ -6,12 +6,16 @@
   padding: 60px 20px;
   animation: fadeInUp 0.6s ease-out;
 }
+.title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* espace entre emoji et titre */
+}
 
-.crypto-list-container h1 {
-  text-align: center;
+.title-gradient {
   font-size: 3.5rem;
   font-weight: 800;
-  margin-bottom: 16px;
   background: linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -19,6 +23,12 @@
   letter-spacing: -2px;
   animation: fadeInScale 0.7s ease-out;
 }
+
+.emoji {
+  font-size: 4.5rem; /* emoji plus grand */
+  line-height: 1;
+}
+
 
 .page-subtitle {
   text-align: center;

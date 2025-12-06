@@ -68,8 +68,12 @@ const CryptoList = () => {
 
   return (
     <div className="crypto-list-container">
-      <h1>💰 Liste des Cryptomonnaies</h1>
-      <p className="page-subtitle">
+      <div class="title-container">
+  <span class="emoji">💰</span>
+  <span class="title-gradient">Liste des Cryptomonnaies</span>
+</div>
+
+       <p className="page-subtitle">
         Suivez les prix en temps réel des principales cryptomonnaies
       </p>
 
@@ -97,12 +101,12 @@ const CryptoList = () => {
       <div className="search-bar">
         <input
           type="text"
-          placeholder="🔍 Rechercher une crypto (nom ou symbole)..."
+          placeholder="Rechercher une crypto (nom ou symbole)..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
         <button onClick={fetchCryptos} className="btn-refresh">
-          🔄 Actualiser
+           Actualiser
         </button>
       </div>
 

@@ -14,6 +14,14 @@
   animation: fadeInScale 0.7s ease-out;
 }
 
+/* Nouveau conteneur pour aligner emoji + titre */
+.dashboard-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px; /* espace entre l’emoji et le titre */
+}
+
 .dashboard-header h1 {
   font-size: 3.5rem;
   font-weight: 800;
@@ -23,8 +31,13 @@
   background-clip: text;
   margin-bottom: 12px;
   letter-spacing: -2px;
-  animation: float 3s ease-in-out infinite;
 }
+
+.emoji {
+  font-size: 2.5rem; /* Emoji plus grand */
+  line-height: 1;
+}
+
 
 .subtitle {
   color: var(--text-muted);

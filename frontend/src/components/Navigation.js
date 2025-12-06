@@ -43,9 +43,10 @@ const Navigation = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand">
-          <span>🚀</span>
-          <span>CryptoTracker</span>
-        </Link>
+  <span className="logo-icon">🪙</span>
+  <span>CryptoTracker</span>
+</Link>
+
         
         <div className="navbar-right">
           <ul className="nav-menu">
@@ -70,12 +71,12 @@ const Navigation = () => {
           </ul>
 
           <button 
-            className={`theme-toggle ${isRotating ? 'rotating' : ''}`}
+            className={`theme-toggle-btn ${isRotating ? 'rotating' : ''}`}
             onClick={toggleTheme}
             aria-label="Toggle theme"
             title={isDarkMode ? 'Mode Jour' : 'Mode Nuit'}
           >
-            {isDarkMode ? '☀️' : '🌙'}
+            {isDarkMode ? '🌙' : '☀️'}
           </button>
         </div>
       </div>

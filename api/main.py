@@ -1,283 +1,213 @@
-# api/main.py
+# api/main.py - FastAPI avec authentification JWT
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
-from datetime import datetime
+from fastapi.security import OAuth2PasswordRequestForm
+from datetime import timedelta
 from database import get_collection
+from auth import (
+    authenticate_user,
+    create_access_token,
+    create_user,
+    get_current_active_user,
+    get_current_admin_user,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    UserCreate,
+    UserResponse,
+    Token
+)
 
-app = FastAPI()
+app = FastAPI(
+    title="Crypto Monitoring API",
+    description="API de surveillance des cryptomonnaies avec authentification JWT",
+    version="2.0.0"
+)
 
-# ✅ CORS - Autoriser React et le HTML local
+# ===== CORS =====
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-        "*"
-    ],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ PAGE HTML
-@app.get("/", response_class=HTMLResponse)
-async def serve_html():
-    return """<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💰 Crypto Tracker</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        .controls input {
-            flex: 1;
-            padding: 12px 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        .controls button {
-            padding: 12px 30px;
-            background-color: #fff;
-            color: #667eea;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .controls button:hover {
-            background-color: #f0f0f0;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .stat-card h3 {
-            color: #666;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-        }
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-        .table-wrapper {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        thead {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #ddd;
-        }
-        th {
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
-            color: #333;
-        }
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        tbody tr:hover {
-            background-color: #f5f5f5;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: white;
-            font-size: 1.2rem;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>💰 Crypto Tracker</h1>
-            <p>Affichage des cryptomonnaies en temps réel</p>
-        </header>
 
-        <div class="controls">
-            <input type="text" id="search" placeholder="Chercher une crypto...">
-            <button onclick="loadData()">🔄 Actualiser</button>
-        </div>
+# ===== ROUTES D'AUTHENTIFICATION =====
 
-        <div id="stats" class="stats"></div>
-        <div id="error" class="error" style="display: none;"></div>
-        <div id="loading" class="loading" style="display: none;">⏳ Chargement...</div>
+@app.post("/auth/register", response_model=UserResponse, tags=["Authentication"])
+async def register(user: UserCreate):
+    """
+    📝 Inscription d'un nouvel utilisateur
+    
+    - **email**: Email valide
+    - **username**: Nom d'utilisateur unique
+    - **password**: Mot de passe (min 8 caractères recommandé)
+    """
+    new_user = create_user(user)
+    return {
+        "email": new_user["email"],
+        "username": new_user["username"],
+        "created_at": new_user["created_at"],
+        "is_active": new_user["is_active"],
+        "role": new_user["role"]
+    }
 
-        <div id="tableContainer" class="table-wrapper" style="display: none;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Symbole</th>
-                        <th>Prix USD</th>
-                        <th>Coin ID</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-            </table>
-        </div>
-    </div>
 
-    <script>
-        let allData = [];
+@app.post("/auth/login", response_model=Token, tags=["Authentication"])
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    🔐 Connexion et obtention du JWT token
+    
+    - **username**: Nom d'utilisateur
+    - **password**: Mot de passe
+    
+    Retourne un access_token JWT valide 30 minutes.
+    """
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user["username"]}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
 
-        document.addEventListener('DOMContentLoaded', loadData);
-        document.getElementById('search').addEventListener('keyup', filterData);
 
-        async function loadData() {
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
-            const tableContainer = document.getElementById('tableContainer');
+@app.get("/auth/me", response_model=UserResponse, tags=["Authentication"])
+async def read_users_me(current_user: dict = Depends(get_current_active_user)):
+    """
+    👤 Récupère les informations de l'utilisateur connecté
+    
+    Nécessite un token JWT valide dans le header Authorization.
+    """
+    return {
+        "email": current_user["email"],
+        "username": current_user["username"],
+        "created_at": current_user["created_at"],
+        "is_active": current_user["is_active"],
+        "role": current_user["role"]
+    }
 
-            loading.style.display = 'block';
-            error.style.display = 'none';
-            tableContainer.style.display = 'none';
 
-            try {
-                const response = await fetch('http://127.0.0.1:8000/prices');
-                const data = await response.json();
+# ===== ROUTES CRYPTOS (PROTÉGÉES) =====
 
-                if (!data.prices || data.prices.length === 0) {
-                    error.textContent = '❌ Aucune donnée disponible';
-                    error.style.display = 'block';
-                    loading.style.display = 'none';
-                    return;
-                }
-
-                allData = data.prices;
-                displayTable(allData);
-                displayStats(allData);
-                loading.style.display = 'none';
-                tableContainer.style.display = 'block';
-
-            } catch (err) {
-                error.textContent = '❌ Erreur: ' + err.message;
-                error.style.display = 'block';
-                loading.style.display = 'none';
-            }
-        }
-
-        function displayTable(data) {
-            const tbody = document.getElementById('tbody');
-            tbody.innerHTML = '';
-
-            data.forEach(crypto => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${crypto.name || 'N/A'}</td>
-                    <td><strong>${crypto.symbol || 'N/A'}</strong></td>
-                    <td>$${(crypto.price_usd || 0).toFixed(6)}</td>
-                    <td>${crypto.coin_id || 'N/A'}</td>
-                    <td>${crypto.timestamp || 'N/A'}</td>
-                `;
-            });
-        }
-
-        function displayStats(data) {
-            const statsContainer = document.getElementById('stats');
-            const prices = data.map(c => c.price_usd || 0);
-            
-            statsContainer.innerHTML = `
-                <div class="stat-card">
-                    <h3>📊 Total Cryptos</h3>
-                    <div class="stat-value">${data.length}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>💰 Prix Min</h3>
-                    <div class="stat-value">$${Math.min(...prices).toFixed(6)}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>📈 Prix Max</h3>
-                    <div class="stat-value">$${Math.max(...prices).toFixed(6)}</div>
-                </div>
-            `;
-        }
-
-        function filterData() {
-            const search = document.getElementById('search').value.toLowerCase();
-            const filtered = allData.filter(c =>
-                (c.name && c.name.toLowerCase().includes(search)) ||
-                (c.symbol && c.symbol.toLowerCase().includes(search))
-            );
-            displayTable(filtered);
-        }
-    </script>
-</body>
-</html>"""
-
-# ✅ API
-@app.get("/prices")
-async def get_prices(collection = Depends(get_collection)):
-    """Retourne tous les prix enregistrés dans MongoDB"""
+@app.get("/prices", tags=["Crypto Data"])
+async def get_prices(
+    collection=Depends(get_collection),
+    current_user: dict = Depends(get_current_active_user)
+):
+    """
+    💰 Récupère les prix des cryptomonnaies
+    
+    🔒 Route protégée - Nécessite authentification
+    """
     try:
         prices = list(collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(50))
         for p in prices:
             if "timestamp" in p:
+                from datetime import datetime
                 p["timestamp"] = datetime.fromtimestamp(p["timestamp"]).strftime("%Y-%m-%d %H:%M:%S")
-        return {"prices": prices}
+        return {"prices": prices, "user": current_user["username"]}
     except Exception as e:
         return {"error": str(e), "prices": []}
 
-@app.get("/health")
+
+@app.get("/prices/latest", tags=["Crypto Data"])
+async def get_latest_prices(
+    limit: int = 10,
+    collection=Depends(get_collection),
+    current_user: dict = Depends(get_current_active_user)
+):
+    """
+    📊 Récupère les derniers prix (limité)
+    
+    🔒 Route protégée - Nécessite authentification
+    """
+    try:
+        prices = list(collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(limit))
+        return {"prices": prices, "count": len(prices)}
+    except Exception as e:
+        return {"error": str(e), "prices": []}
+
+
+# ===== ROUTES ADMIN =====
+
+@app.get("/admin/users", tags=["Admin"])
+async def list_users(current_user: dict = Depends(get_current_admin_user)):
+    """
+    👥 Liste tous les utilisateurs (ADMIN uniquement)
+    
+    🔒 Route protégée - Nécessite rôle admin
+    """
+    from auth import users_collection
+    users = list(users_collection.find({}, {"_id": 0, "hashed_password": 0}))
+    return {"users": users, "count": len(users)}
+
+
+@app.delete("/admin/users/{username}", tags=["Admin"])
+async def delete_user(
+    username: str,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """
+    🗑️ Supprime un utilisateur (ADMIN uniquement)
+    
+    🔒 Route protégée - Nécessite rôle admin
+    """
+    from auth import users_collection
+    result = users_collection.delete_one({"username": username})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": f"User {username} deleted successfully"}
+
+
+# ===== ROUTES PUBLIQUES =====
+
+@app.get("/", tags=["Public"])
+async def root():
+    """
+    🏠 Page d'accueil de l'API
+    """
+    return {
+        "message": "🚀 Crypto Monitoring API v2.0",
+        "docs": "/docs",
+        "auth": {
+            "register": "/auth/register",
+            "login": "/auth/login",
+            "me": "/auth/me"
+        },
+        "endpoints": {
+            "prices": "/prices (🔒 protected)",
+            "latest": "/prices/latest (🔒 protected)",
+            "admin": "/admin/users (🔒 admin only)"
+        }
+    }
+
+
+@app.get("/health", tags=["Public"])
 async def health_check():
-    return {"status": "✅ API is healthy"}
+    """
+    ✅ Health check de l'API
+    """
+    return {"status": "✅ API is healthy", "version": "2.0.0"}
+
+
+@app.get("/public/stats", tags=["Public"])
+async def public_stats(collection=Depends(get_collection)):
+    """
+    📈 Statistiques publiques (sans authentification)
+    """
+    try:
+        count = collection.count_documents({})
+        return {
+            "total_records": count,
+            "message": "Login required for detailed data",
+            "register_url": "/auth/register"
+        }
+    except Exception as e:
+        return {"error": str(e)}

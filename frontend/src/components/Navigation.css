@@ -85,3 +85,42 @@
     font-size: 0.9rem;
   }
 }
+.navbar-right {
+  display: flex;
+  align-items: center;   /* ALIGNEMENT VERTICAL */
+  gap: 16px;
+}
+.theme-toggle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #f3f3f3;
+  cursor: pointer;
+  font-size: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: #e6e6e6;
+}
+
+.rotating {
+  transform: rotate(360deg);
+}
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.logo-icon {
+  font-size: 1.8rem;
+}

@@ -113,12 +113,17 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1>📊 Dashboard</h1>
-        <p className="subtitle">
-          Analyse approfondie des marchés de cryptomonnaies
-        </p>
-      </div>
+  <div className="dashboard-header">
+    <div className="dashboard-title">
+      <span className="emoji">📊</span>
+      <h1>Dashboard</h1>
+    </div>
+
+    <p className="subtitle">
+      Analyse approfondie des marchés de cryptomonnaies
+    </p>
+  </div>
+
 
       {/* Cartes de stats avec icônes */}
       <div className="stats-grid">
@@ -149,7 +154,7 @@ const Dashboard = () => {
         <div className="search-box">
           <input
             type="text"
-            placeholder="🔍 Rechercher par nom ou symbole..."
+            placeholder="Rechercher par nom ou symbole..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -182,7 +187,7 @@ const Dashboard = () => {
           className={`refresh-btn ${loading ? 'loading' : ''}`}
           disabled={loading}
         >
-          {loading ? 'Actualisation...' : '🔄 Actualiser'}
+          {loading ? 'Actualisation...' : ' Actualiser'}
         </button>
       </div>
 
@@ -215,29 +220,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="chart-card">
-          <h2>📊 Volume 24h (Milliards $)</h2>
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip content={<CustomTooltip />} />
-                <Line 
-                  type="monotone" 
-                  dataKey="volume" 
-                  stroke="var(--accent-primary)"
-                  strokeWidth={3}
-                  dot={{ fill: 'var(--accent-primary)', r: 5 }}
-                  activeDot={{ r: 7 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="no-data">Aucune donnée disponible</p>
-          )}
-        </div>
+        
       </div>
 
       {/* Tableau */}
