@@ -113,7 +113,7 @@ const Register = () => {
     <div className="register-container">
       <div className="register-card">
         <div className="register-header">
-          <h1>📝 Inscription</h1>
+          <h1>Inscription</h1>
           <p>Créez votre compte CryptoTracker</p>
         </div>
 

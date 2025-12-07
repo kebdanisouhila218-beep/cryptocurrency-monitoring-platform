@@ -130,7 +130,7 @@ const Navigation = () => {
             aria-label="Toggle theme"
             title={isDarkMode ? 'Mode Jour' : 'Mode Nuit'}
           >
-            {isDarkMode ? '☀️' : '🌙'}
+            {isDarkMode ? '🌙' : '☀️'}
           </button>
         </div>
       </div>
