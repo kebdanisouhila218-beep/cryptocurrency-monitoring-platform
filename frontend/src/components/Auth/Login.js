@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../services/authService';
+import { toast } from '../Toast';
 import './Login.css';
 
 const Login = () => {
@@ -38,10 +39,13 @@ const Login = () => {
       
       if (result.success) {
         // Connexion réussie
-        console.log('✅ Connexion réussie');
-        navigate('/dashboard'); // Rediriger vers le dashboard
+        toast.success(`Bienvenue ${formData.username} ! 🎉`);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 500);
       } else {
         setError(result.error);
+        toast.error(result.error);
       }
     } catch (err) {
       setError('Une erreur est survenue');
@@ -54,7 +58,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>Connexion</h1>
+          <h1>🔐 Connexion</h1>
           <p>Accédez à votre compte CryptoTracker</p>
         </div>
 

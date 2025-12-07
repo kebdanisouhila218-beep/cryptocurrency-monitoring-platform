@@ -7,7 +7,9 @@ import Dashboard from './components/Dashboard';
 import Navigation from './components/Navigation';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
+import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
+import Toast from './components/Toast';
 import './App.css';
 
 function App() {
@@ -15,6 +17,7 @@ function App() {
     <Router>
       <div className="app-container">
         <Navigation />
+        <Toast />
         <Routes>
           {/* Routes publiques */}
           <Route path="/login" element={<Login />} />
@@ -34,6 +37,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } 
           />

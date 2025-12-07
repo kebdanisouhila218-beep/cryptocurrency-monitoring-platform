@@ -90,13 +90,18 @@ const Navigation = () => {
                     <span>Dashboard</span>
                   </Link>
                 </li>
-                <li className="nav-item user-menu">
-                  <span className="nav-link user-info">
+                <li className="nav-item">
+                  <Link 
+                    to="/profile" 
+                    className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}
+                  >
                     <span>👤</span>
                     <span>{username}</span>
-                  </span>
+                  </Link>
+                </li>
+                <li className="nav-item">
                   <button onClick={handleLogout} className="btn-logout" title="Déconnexion">
-                    🚪 Déconnexion
+                    Déconnexion
                   </button>
                 </li>
               </>
