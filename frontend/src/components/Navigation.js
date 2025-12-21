@@ -92,6 +92,15 @@ const Navigation = () => {
                 </li>
                 <li className="nav-item">
                   <Link 
+                    to="/alerts" 
+                    className={`nav-link ${location.pathname === '/alerts' ? 'active' : ''}`}
+                  >
+                    <span>🔔</span>
+                    <span>Alertes</span>
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link 
                     to="/profile" 
                     className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}
                   >

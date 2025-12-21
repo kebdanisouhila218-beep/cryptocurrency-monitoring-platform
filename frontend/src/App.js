@@ -8,6 +8,7 @@ import Navigation from './components/Navigation';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Profile from './components/Profile';
+import Alerts from './components/Alerts';
 import ProtectedRoute from './components/ProtectedRoute';
 import Toast from './components/Toast';
 import './App.css';
@@ -45,6 +46,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/alerts" 
+            element={
+              <ProtectedRoute>
+                <Alerts />
               </ProtectedRoute>
             } 
           />

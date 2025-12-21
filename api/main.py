@@ -4,7 +4,8 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
-from database import get_collection
+from database import get_collection, get_alerts_collection
+from routes.alerts import router as alerts_router
 from auth import (
     authenticate_user,
     create_access_token,
@@ -22,6 +23,9 @@ app = FastAPI(
     description="API de surveillance des cryptomonnaies avec authentification JWT",
     version="2.0.0"
 )
+
+# ===== INCLUSION DES ROUTES =====
+app.include_router(alerts_router)
 
 # ===== CORS =====
 app.add_middleware(
@@ -184,7 +188,8 @@ async def root():
         "endpoints": {
             "prices": "/prices (🔒 protected)",
             "latest": "/prices/latest (🔒 protected)",
-            "admin": "/admin/users (🔒 admin only)"
+            "admin": "/admin/users (🔒 admin only)",
+            "alerts": "/alerts (🔒 protected)"
         }
     }
 

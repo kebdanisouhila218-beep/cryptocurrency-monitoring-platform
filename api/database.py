@@ -21,3 +21,14 @@ def get_collection():
     except Exception as e:
         print(f"❌ Erreur de connexion MongoDB: {e}")
         raise
+
+def get_alerts_collection():
+    """Retourne la collection des alertes de prix"""
+    try:
+        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+        client.server_info()
+        print(f"✅ Connexion MongoDB réussie pour collection alerts")
+        return client[DB_NAME]["alerts"]
+    except Exception as e:
+        print(f"❌ Erreur de connexion MongoDB (alerts): {e}")
+        raise
