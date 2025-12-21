@@ -1,4 +1,4 @@
-# api/main.py - FastAPI avec authentification JWT
+# api/main.py - AJOUT DU FILTRE DES CRYPTOS POPULAIRES
 
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,6 +23,24 @@ app = FastAPI(
     description="API de surveillance des cryptomonnaies avec authentification JWT",
     version="2.0.0"
 )
+
+# ===== LISTE DES 50 CRYPTOS POPULAIRES =====
+POPULAR_CRYPTO_SYMBOLS = [
+    # Top 13
+    "BTC", "ETH", "BNB", "SOL", "XRP", "ADA", "DOGE", 
+    "DOT", "MATIC", "LTC", "AVAX", "LINK", "ATOM", "UNI", "XLM",
+    
+    # 35 supplémentaires
+    "TRX", "ETC", "BCH", "NEAR", "LEO", "ICP", "APT", "ARB", "OP",
+    "STX", "FIL", "LDO", "MNT", "IMX", "INJ", "MKR", "RUNE", "GRT",
+    "AAVE", "SNX", "FTM", "ALGO", "VET", "EGLD", "AXS", "SAND", "MANA",
+    "THETA", "XTZ", "FLOW", "EOS", "CHZ", "KCS", "BTT", "HBAR", "ZIL",
+    "KSM", "GALA", "CRV", "QNT", "1INCH", "NEO", "COMP", "ZRX", "ENJ",
+    "BAT", "LRC", "CHR",
+    
+    # Stablecoins
+    "USDT", "USDC", "BUSD", "DAI"
+]
 
 # ===== INCLUSION DES ROUTES =====
 app.include_router(alerts_router)
@@ -102,6 +120,7 @@ async def read_users_me(current_user: dict = Depends(get_current_active_user)):
 
 @app.get("/prices", tags=["Crypto Data"])
 async def get_prices(
+    only_popular: bool = True,  # ✅ NOUVEAU: Filtre par défaut
     collection=Depends(get_collection),
     current_user: dict = Depends(get_current_active_user)
 ):
@@ -109,21 +128,69 @@ async def get_prices(
     💰 Récupère les prix des cryptomonnaies
     
     🔒 Route protégée - Nécessite authentification
+    
+    **Paramètres:**
+    - `only_popular`: Si True (par défaut), retourne seulement les cryptos populaires (BTC, ETH, etc.)
     """
     try:
-        prices = list(collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(50))
+        # ✅ NOUVEAU: Filtrer par symboles populaires
+        if only_popular:
+            query = {"symbol": {"$in": POPULAR_CRYPTO_SYMBOLS}}
+            print(f"[API] 🔍 Filtre activé: seulement cryptos populaires")
+        else:
+            query = {}
+            print(f"[API] 📊 Pas de filtre: toutes les cryptos")
+        
+        # Récupérer les dernières entrées pour chaque crypto (éviter les doublons)
+        pipeline = [
+            {"$match": query},
+            {"$sort": {"timestamp": -1}},
+            # Grouper par symbol pour avoir seulement la dernière valeur
+            {"$group": {
+                "_id": "$symbol",
+                "coin_id": {"$first": "$coin_id"},
+                "symbol": {"$first": "$symbol"},
+                "name": {"$first": "$name"},
+                "price_usd": {"$first": "$price_usd"},
+                "volume_24h": {"$first": "$volume_24h"},
+                "market_cap": {"$first": "$market_cap"},
+                "timestamp": {"$first": "$timestamp"}
+            }},
+            {"$sort": {"price_usd": -1}},  # Trier par prix décroissant
+            {"$limit": 50}
+        ]
+        
+        prices = list(collection.aggregate(pipeline))
+        
+        # Formater les données
         for p in prices:
             if "timestamp" in p:
                 from datetime import datetime
                 p["timestamp"] = datetime.fromtimestamp(p["timestamp"]).strftime("%Y-%m-%d %H:%M:%S")
-        return {"prices": prices, "user": current_user["username"]}
+            # Supprimer le _id MongoDB
+            if "_id" in p:
+                del p["_id"]
+        
+        print(f"[API] ✅ {len(prices)} cryptos retournées")
+        
+        # Afficher les 5 premières pour debug
+        if len(prices) > 0:
+            print(f"[API] 📊 Top 5 cryptos:")
+            for i, p in enumerate(prices[:5]):
+                print(f"[API]   {i+1}. {p['symbol']:6s} - ${p['price_usd']:.2f}")
+        
+        return {"prices": prices, "user": current_user["username"], "count": len(prices)}
     except Exception as e:
+        print(f"[API] ❌ Erreur: {e}")
+        import traceback
+        traceback.print_exc()
         return {"error": str(e), "prices": []}
 
 
 @app.get("/prices/latest", tags=["Crypto Data"])
 async def get_latest_prices(
     limit: int = 10,
+    only_popular: bool = True,
     collection=Depends(get_collection),
     current_user: dict = Depends(get_current_active_user)
 ):
@@ -133,7 +200,8 @@ async def get_latest_prices(
     🔒 Route protégée - Nécessite authentification
     """
     try:
-        prices = list(collection.find({}, {"_id": 0}).sort("timestamp", -1).limit(limit))
+        query = {"symbol": {"$in": POPULAR_CRYPTO_SYMBOLS}} if only_popular else {}
+        prices = list(collection.find(query, {"_id": 0}).sort("timestamp", -1).limit(limit))
         return {"prices": prices, "count": len(prices)}
     except Exception as e:
         return {"error": str(e), "prices": []}
@@ -209,8 +277,10 @@ async def public_stats(collection=Depends(get_collection)):
     """
     try:
         count = collection.count_documents({})
+        popular_count = collection.count_documents({"symbol": {"$in": POPULAR_CRYPTO_SYMBOLS}})
         return {
             "total_records": count,
+            "popular_cryptos": popular_count,
             "message": "Login required for detailed data",
             "register_url": "/auth/register"
         }
