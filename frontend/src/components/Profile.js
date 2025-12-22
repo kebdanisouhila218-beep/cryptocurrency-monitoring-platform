@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
+import DiscordSettings from './Settings/DiscordSettings';
 import './Profile.css';
 
 const Profile = () => {
@@ -113,7 +114,7 @@ const Profile = () => {
             🚪 Se déconnecter
           </button>
           <button className="btn-back" onClick={() => navigate('/dashboard')}>
-            ← Retour au Dashboard
+            Retour au Dashboard
           </button>
         </div>
 
@@ -138,6 +139,9 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
+        {/* Configuration des notifications Discord */}
+        <DiscordSettings />
       </div>
     </div>
   );

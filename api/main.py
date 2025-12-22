@@ -3,9 +3,14 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
+import os
+import threading
+import time
 from database import get_collection, get_alerts_collection
 from routes.alerts import router as alerts_router
+from routes.profile import router as profile_router
+from services.alert_checker import check_alerts
 from auth import (
     authenticate_user,
     create_access_token,
@@ -23,6 +28,9 @@ app = FastAPI(
     description="API de surveillance des cryptomonnaies avec authentification JWT",
     version="2.0.0"
 )
+
+ALERT_CHECKER_ENABLED = os.getenv("ALERT_CHECKER_ENABLED", "true").lower() == "true"
+ALERT_CHECK_INTERVAL_SECONDS = int(os.getenv("ALERT_CHECK_INTERVAL_SECONDS", "60"))
 
 # ===== LISTE DES 50 CRYPTOS POPULAIRES =====
 POPULAR_CRYPTO_SYMBOLS = [
@@ -44,6 +52,7 @@ POPULAR_CRYPTO_SYMBOLS = [
 
 # ===== INCLUSION DES ROUTES =====
 app.include_router(alerts_router)
+app.include_router(profile_router)
 
 # ===== CORS =====
 app.add_middleware(
@@ -53,6 +62,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def _alert_checker_loop():
+    while True:
+        try:
+            check_alerts()
+        except Exception as e:
+            print(f"[API] ⚠️ Erreur alert checker loop: {e}")
+        time.sleep(max(5, ALERT_CHECK_INTERVAL_SECONDS))
+
+
+@app.on_event("startup")
+def start_alert_checker():
+    if not ALERT_CHECKER_ENABLED:
+        print("[API] ℹ️ Alert checker désactivé (ALERT_CHECKER_ENABLED=false)")
+        return
+
+    t = threading.Thread(target=_alert_checker_loop, daemon=True)
+    t.start()
+    print(f"[API] ✅ Alert checker démarré (interval={ALERT_CHECK_INTERVAL_SECONDS}s)")
 
 
 # ===== ROUTES D'AUTHENTIFICATION =====
@@ -162,11 +191,13 @@ async def get_prices(
         
         prices = list(collection.aggregate(pipeline))
         
-        # Formater les données
+        # Formater les données avec fuseau horaire UTC+1 (Europe/Paris)
         for p in prices:
             if "timestamp" in p:
-                from datetime import datetime
-                p["timestamp"] = datetime.fromtimestamp(p["timestamp"]).strftime("%Y-%m-%d %H:%M:%S")
+                # Convertir timestamp UTC vers UTC+1
+                utc_dt = datetime.utcfromtimestamp(p["timestamp"])
+                local_dt = utc_dt + timedelta(hours=1)  # UTC+1
+                p["timestamp"] = local_dt.strftime("%Y-%m-%d %H:%M:%S")
             # Supprimer le _id MongoDB
             if "_id" in p:
                 del p["_id"]

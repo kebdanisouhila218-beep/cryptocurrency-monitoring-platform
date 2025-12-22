@@ -29,7 +29,20 @@ services:
       - "8000:8000"
     depends_on:
       - mongo
-
+    environment:
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - MONGO_URI=mongodb://mongo:27017/
+      - ALERT_CHECKER_ENABLED=true
+      - ALERT_CHECK_INTERVAL_SECONDS=60
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=kebdanisouhila218@gmail.com
+      - SMTP_PASSWORD=qawaplnbkdxivgtw
+      - SMTP_FROM_EMAIL=kebdanisouhila218@gmail.com
+      - SMTP_FROM_NAME=Crypto Monitoring
+      - EMAIL_DEBUG_MODE=false
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
 
   test-unit-api:
     image: python:3.11-slim

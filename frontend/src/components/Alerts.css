@@ -192,16 +192,21 @@
   background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: 16px;
   font-weight: 700;
+  font-size: 1.05rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: 0 6px 20px var(--shadow);
   min-height: 54px;
+}
+
+body.dark-mode .btn-create {
+  color: #000;
 }
 
 .btn-create:hover {

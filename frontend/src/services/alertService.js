@@ -2,7 +2,7 @@
 import axios from 'axios';
 import authService from './authService';
 
-const API_URL = 'http://127.0.0.1:8000/alerts';
+const API_URL = 'http://localhost:8000/alerts';
 
 const alertService = {
   // Créer une nouvelle alerte

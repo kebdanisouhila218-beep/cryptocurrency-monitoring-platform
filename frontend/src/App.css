@@ -41,7 +41,7 @@ body.dark-mode {
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),

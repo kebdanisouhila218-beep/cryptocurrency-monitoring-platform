@@ -1,7 +1,7 @@
 # api/routes/alerts.py - Routes pour les alertes de prix
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -26,8 +26,24 @@ router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
 # ===== HELPER FUNCTIONS =====
 
+def convert_utc_to_local(dt: datetime) -> datetime:
+    """Convertit une date UTC vers UTC+1 (Europe/Paris)"""
+    if dt is None:
+        return None
+    return dt + timedelta(hours=1)
+
+
 def alert_to_response(alert: dict) -> AlertResponse:
     """Convertit un document MongoDB en AlertResponse"""
+    # Convertir les dates UTC vers UTC+1
+    created_at = alert["created_at"]
+    triggered_at = alert.get("triggered_at")
+    
+    if created_at:
+        created_at = convert_utc_to_local(created_at)
+    if triggered_at:
+        triggered_at = convert_utc_to_local(triggered_at)
+    
     return AlertResponse(
         id=str(alert["_id"]),
         user_id=alert["user_id"],
@@ -35,8 +51,8 @@ def alert_to_response(alert: dict) -> AlertResponse:
         target_price=alert["target_price"],
         alert_type=alert["alert_type"],
         is_active=alert["is_active"],
-        created_at=alert["created_at"],
-        triggered_at=alert.get("triggered_at")
+        created_at=created_at,
+        triggered_at=triggered_at
     )
 
 
@@ -76,6 +92,17 @@ async def create_alert(
     
     print(f"[DEBUG] Alerte créée avec ID: {result.inserted_id}")
     
+    # Optionnel: vérifier immédiatement les alertes (permet un déclenchement instantané)
+    try:
+        check_alerts()
+    except Exception as e:
+        print(f"[DEBUG] ⚠️ Échec check_alerts post-create: {e}")
+
+    # Recharger l'alerte pour refléter un éventuel déclenchement instantané
+    refreshed = alerts_collection.find_one({"_id": alert_doc["_id"]})
+    if refreshed:
+        return alert_to_response(refreshed)
+
     return alert_to_response(alert_doc)
 
 

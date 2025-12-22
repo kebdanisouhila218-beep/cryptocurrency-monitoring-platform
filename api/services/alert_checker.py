@@ -6,6 +6,17 @@ from pymongo import MongoClient
 from bson import ObjectId
 import os
 
+# Import du service Discord (optionnel)
+try:
+    from services.discord_service import send_alert_discord
+    DISCORD_SERVICE_AVAILABLE = True
+except ImportError:
+    try:
+        from .discord_service import send_alert_discord
+        DISCORD_SERVICE_AVAILABLE = True
+    except ImportError:
+        DISCORD_SERVICE_AVAILABLE = False
+
 # Import du service email
 try:
     from services.email_service import send_alert_email
@@ -19,9 +30,11 @@ except ImportError:
         print("[CHECKER] ⚠️ Service email non disponible")
 
 # Configuration MongoDB
-MONGO_HOST = os.getenv("MONGO_HOST", "127.0.0.1")
-MONGO_PORT = os.getenv("MONGO_PORT", "27017")
-MONGO_URI = f"mongodb://{MONGO_HOST}:{MONGO_PORT}/"
+MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    MONGO_HOST = os.getenv("MONGO_HOST", "127.0.0.1")
+    MONGO_PORT = os.getenv("MONGO_PORT", "27017")
+    MONGO_URI = f"mongodb://{MONGO_HOST}:{MONGO_PORT}/"
 DB_NAME = "crypto_db"
 
 
@@ -51,8 +64,13 @@ def get_latest_price(db, crypto_symbol: str) -> Optional[float]:
     )
     
     if latest and "price_usd" in latest:
-        print(f"[CHECKER] Prix trouvé pour {crypto_symbol}: ${latest['price_usd']:.2f}")
-        return latest["price_usd"]
+        try:
+            price = float(latest["price_usd"])
+        except Exception:
+            print(f"[CHECKER] ⚠️ Prix invalide pour {crypto_symbol}: {latest.get('price_usd')}")
+            return None
+        print(f"[CHECKER] Prix trouvé pour {crypto_symbol}: ${price:.2f}")
+        return price
     
     print(f"[CHECKER] ⚠️ Prix non trouvé pour {crypto_symbol}")
     return None
@@ -77,6 +95,31 @@ def get_user_email(db, user_id: str) -> Optional[str]:
             return user["email"]
     except Exception as e:
         print(f"[CHECKER] ⚠️ Erreur récupération email user {user_id}: {e}")
+    
+    return None
+
+
+def get_user_discord_webhook(db, user_id: str) -> Optional[str]:
+    """
+    Récupère le webhook Discord d'un utilisateur depuis la collection users.
+    
+    Args:
+        db: Connexion à la base de données
+        user_id: ID de l'utilisateur
+    
+    Returns:
+        L'URL du webhook Discord ou None si non configuré
+    """
+    users_collection = db["users"]
+    
+    try:
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        if user and "discord_webhook_url" in user:
+            webhook = user["discord_webhook_url"]
+            if webhook and webhook.strip():
+                return webhook.strip()
+    except Exception as e:
+        print(f"[CHECKER] ⚠️ Erreur récupération webhook Discord user {user_id}: {e}")
     
     return None
 
@@ -116,6 +159,8 @@ def trigger_alert(db, alert: dict, current_price: float) -> bool:
             print(f"[CHECKER]    - Prix cible: ${alert['target_price']:.2f}")
             print(f"[CHECKER]    - Prix actuel: ${current_price:.2f}")
             print(f"[CHECKER]    - User ID: {alert['user_id']}")
+
+            user_id = alert.get("user_id")
             
             # ===== ENVOI EMAIL DE NOTIFICATION =====
             if EMAIL_SERVICE_AVAILABLE:
@@ -142,6 +187,34 @@ def trigger_alert(db, alert: dict, current_price: float) -> bool:
                     print(f"[CHECKER] ⚠️ Email utilisateur non trouvé")
             else:
                 print(f"[CHECKER] ⚠️ Service email non disponible")
+
+            # ===== NOTIFICATION DISCORD =====
+            if DISCORD_SERVICE_AVAILABLE:
+                try:
+                    # Récupérer le webhook Discord de l'utilisateur (ou utiliser le défaut)
+                    user_webhook = None
+                    if user_id:
+                        user_webhook = get_user_discord_webhook(db, user_id)
+                        if user_webhook:
+                            print(f"[CHECKER] 📱 Webhook Discord utilisateur trouvé")
+                    
+                    discord_payload = {
+                        "crypto_symbol": alert["crypto_symbol"],
+                        "alert_type": alert["alert_type"],
+                        "target_price": alert["target_price"],
+                        "triggered_price": current_price,
+                        "triggered_at": triggered_at,
+                        "user_id": user_id
+                    }
+                    discord_result = send_alert_discord(discord_payload, webhook_url=user_webhook)
+                    if discord_result.get("success"):
+                        print(f"[CHECKER] ✅ Notification Discord envoyée")
+                    else:
+                        print(f"[CHECKER] ⚠️ Discord: {discord_result.get('error')}")
+                except Exception as e:
+                    print(f"[CHECKER] ⚠️ Erreur Discord (user_id={user_id}): {e}")
+            else:
+                print(f"[CHECKER] ⚠️ Service Discord non disponible")
             
             return True
         
@@ -164,7 +237,10 @@ def check_single_alert(db, alert: dict) -> Tuple[bool, Optional[str]]:
         Tuple (triggered: bool, message: str ou None)
     """
     crypto_symbol = alert["crypto_symbol"]
-    target_price = alert["target_price"]
+    try:
+        target_price = float(alert["target_price"])
+    except Exception:
+        return False, f"Prix cible invalide pour alerte {str(alert.get('_id', 'unknown'))}"
     alert_type = alert["alert_type"]
     
     # Récupérer le prix actuel
