@@ -1,6 +1,6 @@
 # collector/test_collector_logic.py
 import pytest
-import requests_mock
+requests_mock = pytest.importorskip("requests_mock")
 from collector_logic import fetch_coinpaprika_data, transform_coin_data
 
 MOCK_API_RESPONSE = [

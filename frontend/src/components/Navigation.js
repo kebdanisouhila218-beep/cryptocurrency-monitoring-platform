@@ -99,6 +99,16 @@ const Navigation = () => {
                     <span>Alertes</span>
                   </Link>
                 </li>
+                {/* 💼 NOUVEAU : Lien Portfolio */}
+                <li className="nav-item">
+                  <Link 
+                    to="/portfolio" 
+                    className={`nav-link ${location.pathname === '/portfolio' ? 'active' : ''}`}
+                  >
+                    <span>💼</span>
+                    <span>Portfolio</span>
+                  </Link>
+                </li>
                 <li className="nav-item">
                   <Link 
                     to="/profile" 

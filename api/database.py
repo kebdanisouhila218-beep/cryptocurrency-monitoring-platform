@@ -32,3 +32,30 @@ def get_alerts_collection():
     except Exception as e:
         print(f"❌ Erreur de connexion MongoDB (alerts): {e}")
         raise
+
+def get_portfolios_collection():
+    try:
+        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+        client.server_info()
+        return client[DB_NAME]["portfolios"]
+    except Exception as e:
+        print(f"❌ Erreur de connexion MongoDB (portfolios): {e}")
+        raise
+
+def get_positions_collection():
+    try:
+        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+        client.server_info()
+        return client[DB_NAME]["positions"]
+    except Exception as e:
+        print(f"❌ Erreur de connexion MongoDB (positions): {e}")
+        raise
+
+def get_transactions_collection():
+    try:
+        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+        client.server_info()
+        return client[DB_NAME]["transactions"]
+    except Exception as e:
+        print(f"❌ Erreur de connexion MongoDB (transactions): {e}")
+        raise

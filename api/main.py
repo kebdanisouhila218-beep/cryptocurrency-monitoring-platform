@@ -10,6 +10,7 @@ import time
 from database import get_collection, get_alerts_collection
 from routes.alerts import router as alerts_router
 from routes.profile import router as profile_router
+from routes.portfolio import router as portfolio_router
 from services.alert_checker import check_alerts
 from auth import (
     authenticate_user,
@@ -53,6 +54,7 @@ POPULAR_CRYPTO_SYMBOLS = [
 # ===== INCLUSION DES ROUTES =====
 app.include_router(alerts_router)
 app.include_router(profile_router)
+app.include_router(portfolio_router)
 
 # ===== CORS =====
 app.add_middleware(

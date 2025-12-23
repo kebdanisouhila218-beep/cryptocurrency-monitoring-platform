@@ -2,7 +2,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import Mock
-from main import app, get_collection
+from main import app, get_collection, get_current_active_user
 
 MOCK_PRICES = [
     {
@@ -16,22 +16,26 @@ MOCK_PRICES = [
     }
 ]
 
-def test_root_returns_html():
+def test_root_returns_json():
     client = TestClient(app)
     response = client.get("/")
     assert response.status_code == 200
-    assert "Crypto Tracker" in response.text
-    assert response.headers["content-type"] == "text/html; charset=utf-8"
+    data = response.json()
+    assert "message" in data
+    assert "Crypto" in data["message"]
     
 def test_prices():
     # Mock MongoDB
     mock_collection = Mock()
-    mock_cursor = Mock()
-    mock_cursor.sort.return_value.limit.return_value = MOCK_PRICES
-    mock_collection.find.return_value = mock_cursor
+    # Make the mock return an iterable result for aggregation
+    mock_collection.aggregate.return_value = MOCK_PRICES
 
-    # Injecter le mock
+    # Mock authentication
+    mock_user = {"username": "testuser", "email": "test@example.com"}
+    
+    # Injecter les mocks
     app.dependency_overrides[get_collection] = lambda: mock_collection
+    app.dependency_overrides[get_current_active_user] = lambda: mock_user
 
     # Tester
     client = TestClient(app)
