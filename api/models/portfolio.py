@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Dict, Optional
+from uuid import uuid4
 
 from pydantic import BaseModel, Field, validator
 
@@ -8,6 +9,41 @@ from pydantic import BaseModel, Field, validator
 class TransactionType(str, Enum):
     BUY = "BUY"
     SELL = "SELL"
+
+
+class Portfolio(BaseModel):
+    portfolio_id: str = Field(default_factory=lambda: str(uuid4()))
+    user_id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    total_value_usd: float = Field(0.0, ge=0)
+    total_invested_usd: float = Field(0.0, ge=0)
+    profit_loss_usd: float = 0.0
+    profit_loss_percent: float = 0.0
+    holdings: Dict[str, float] = Field(default_factory=dict)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    @validator("name")
+    def validate_portfolio_name(cls, v: str) -> str:
+        vv = v.strip()
+        if not vv:
+            raise ValueError("name must not be empty")
+        return vv
+
+    @validator("holdings")
+    def validate_holdings(cls, v: Dict[str, float]) -> Dict[str, float]:
+        cleaned: Dict[str, float] = {}
+        for k, qty in (v or {}).items():
+            if k is None:
+                continue
+            symbol = str(k).upper().strip()
+            if not symbol:
+                continue
+            q = float(qty)
+            if q < 0:
+                raise ValueError("holdings quantities must be >= 0")
+            cleaned[symbol] = q
+        return cleaned
 
 
 class PortfolioCreate(BaseModel):
