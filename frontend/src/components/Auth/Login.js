@@ -24,30 +24,37 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('[LOGIN] handleSubmit appelé');
     setError('');
     setLoading(true);
 
     // Validation basique
     if (!formData.username || !formData.password) {
+      console.log('[LOGIN] Validation échouée: champs vides');
       setError('Tous les champs sont requis');
       setLoading(false);
       return;
     }
 
+    console.log('[LOGIN] Appel authService.login...');
     try {
       const result = await authService.login(formData.username, formData.password);
+      console.log('[LOGIN] Résultat reçu:', result);
       
-      if (result.success) {
+      if (result && result.success) {
         // Connexion réussie
+        console.log('[LOGIN] Connexion réussie, redirection...');
         toast.success(`Bienvenue ${formData.username} ! 🎉`);
         setTimeout(() => {
           navigate('/dashboard');
         }, 500);
       } else {
-        setError(result.error);
-        toast.error(result.error);
+        console.log('[LOGIN] Échec connexion:', result?.error);
+        setError(result?.error || 'Erreur de connexion');
+        toast.error(result?.error || 'Erreur de connexion');
       }
     } catch (err) {
+      console.error('[LOGIN] Exception:', err);
       setError('Une erreur est survenue');
     } finally {
       setLoading(false);

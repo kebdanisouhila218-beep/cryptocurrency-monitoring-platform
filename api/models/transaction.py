@@ -60,7 +60,7 @@ class Transaction(BaseModel):
 
 
 class TransactionCreate(BaseModel):
-    portfolio_id: str = Field(..., min_length=1)
+    portfolio_id: Optional[str] = None
     transaction_type: TransactionType
     crypto_symbol: str = Field(..., min_length=1)
     quantity: float = Field(..., gt=0)
@@ -68,11 +68,11 @@ class TransactionCreate(BaseModel):
     notes: Optional[str] = None
 
     @validator("portfolio_id")
-    def strip_portfolio_id(cls, v: str) -> str:
+    def strip_portfolio_id(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
         vv = v.strip()
-        if not vv:
-            raise ValueError("portfolio_id must not be empty")
-        return vv
+        return vv if vv else None
 
     @validator("crypto_symbol")
     def crypto_symbol_uppercase(cls, v: str) -> str:
@@ -91,3 +91,8 @@ class TransactionCreate(BaseModel):
 
 class TransactionResponse(Transaction):
     pass
+
+
+class TransactionListResponse(BaseModel):
+    transactions: list[TransactionResponse]
+    count: int

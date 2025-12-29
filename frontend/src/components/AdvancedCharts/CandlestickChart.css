@@ -1,0 +1,332 @@
+/* frontend/src/components/AdvancedCharts/CandlestickChart.css */
+
+.candlestick-container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding: 60px 20px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.chart-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.chart-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-title h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.chart-title .emoji {
+  font-size: 2.5rem;
+}
+
+.candlestick-container .subtitle {
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  margin-top: 12px;
+}
+
+/* Contrôles */
+.chart-controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 40px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.chart-controls .form-group {
+  flex: 1;
+  min-width: 180px;
+}
+
+.chart-controls label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chart-controls select {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.chart-controls select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.btn-refresh {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+body.dark-mode .btn-refresh {
+  color: #000;
+}
+
+.btn-refresh:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--shadow-hover);
+}
+
+.btn-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Graphique */
+.chart-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.chart-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.crypto-symbol {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.data-points {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  background: var(--bg-secondary);
+  border-radius: 20px;
+}
+
+/* Statistiques */
+.chart-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.stat-item {
+  text-align: center;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-value.green {
+  color: #22c55e;
+}
+
+.stat-value.red {
+  color: #ef4444;
+}
+
+/* Légende */
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+/* Tooltip */
+.candlestick-tooltip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px var(--shadow);
+  min-width: 180px;
+}
+
+.tooltip-date {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+}
+
+.tooltip-row .label {
+  color: var(--text-muted);
+}
+
+.tooltip-row .green {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.tooltip-row .red {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Loading & Error */
+.loading {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.loading p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-top: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  font-weight: 600;
+}
+
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .candlestick-container {
+    padding: 40px 16px;
+  }
+
+  .chart-title h1 {
+    font-size: 2.2rem;
+  }
+
+  .chart-controls {
+    flex-direction: column;
+  }
+
+  .chart-controls .form-group {
+    min-width: 100%;
+  }
+
+  .btn-refresh {
+    width: 100%;
+  }
+
+  .chart-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .chart-legend {
+    flex-direction: column;
+    align-items: center;
+  }
+}

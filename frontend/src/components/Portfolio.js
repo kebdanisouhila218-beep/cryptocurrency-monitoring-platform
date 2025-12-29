@@ -108,12 +108,17 @@ const Portfolio = () => {
   };
 
   const formatPrice = (price) => {
+    const num = typeof price === 'number' ? price : Number(price);
+    if (!Number.isFinite(num)) {
+      return '—';
+    }
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(price);
+    }).format(num);
   };
 
   const formatPercent = (value) => {
@@ -165,7 +170,7 @@ const Portfolio = () => {
                   <h3>{portfolio.name}</h3>
                   <div className="portfolio-actions">
                     <button 
-                      className="btn btn-sm btn-info"
+                      className="btn btn-sm btn-secondary"
                       onClick={() => {
                         setSelectedPortfolio(portfolio);
                         setShowTradeModal(true);
@@ -174,7 +179,7 @@ const Portfolio = () => {
                       Trader
                     </button>
                     <button 
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-sm btn-info"
                       onClick={() => window.location.href = `/portfolio/${portfolio.id}`}
                     >
                       Détails

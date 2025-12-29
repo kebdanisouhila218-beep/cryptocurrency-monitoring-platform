@@ -57,6 +57,16 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+body.dark-mode .portfolio-container .portfolio-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary);
+}
+
+body.dark-mode .portfolio-container .portfolio-card:hover {
+  box-shadow: 0 8px 25px var(--shadow-hover);
+}
+
 .portfolio-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
@@ -92,6 +102,10 @@
   line-height: 1.5;
 }
 
+body.dark-mode .portfolio-container .portfolio-description {
+  color: var(--text-secondary);
+}
+
 .portfolio-stats {
   display: flex;
   flex-direction: column;
@@ -116,9 +130,17 @@
   font-size: 0.9rem;
 }
 
+body.dark-mode .portfolio-container .stat .label {
+  color: var(--text-secondary);
+}
+
 .stat .value {
   color: var(--text-primary);
   font-weight: 600;
+}
+
+body.dark-mode .portfolio-container .stat .value {
+  color: var(--text-primary);
 }
 
 .stat .value.positive {

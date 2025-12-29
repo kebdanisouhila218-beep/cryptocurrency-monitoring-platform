@@ -146,10 +146,14 @@ def fetch_and_store_task(self):
         client = MongoClient(MONGO_URI)
         db = client[DB_NAME]
         collection = db[COLLECTION_NAME]
+        
+        # ✅ NOUVELLE : Collection historique pour les prévisions
+        history_collection = db["price_history"]
 
         # 3. ✅ UPSERT : Remplacer au lieu d'accumuler
         inserted_count = 0
         updated_count = 0
+        history_count = 0
         current_timestamp = time.time()
         
         for coin in coins:
@@ -184,22 +188,28 @@ def fetch_and_store_task(self):
             else:
                 updated_count += 1
                 print(f"[CELERY] 🔄 {coin['symbol']:6s} = ${doc['price_usd']:>12.4f} (MIS À JOUR)")
+            
+            # ✅ NOUVEAU : INSERT dans price_history (historique complet)
+            history_collection.insert_one(doc.copy())
+            history_count += 1
 
         # 4. Statistiques finales
         total_docs = collection.count_documents({})
+        total_history = history_collection.count_documents({})
         
         print("\n" + "="*60)
-        print(f"[CELERY] ✅ Collecte terminée avec succès!")
-        print(f"[CELERY] 📊 Résumé:")
+        print("[CELERY] Collecte terminée avec succès!")
+        print("[CELERY] Résumé:")
         print(f"[CELERY]    - Nouvelles cryptos: {inserted_count}")
         print(f"[CELERY]    - Cryptos mises à jour: {updated_count}")
-        print(f"[CELERY]    - Total en DB: {total_docs}")
+        print(f"[CELERY]    - Total en DB (prices): {total_docs}")
+        print(f"[CELERY]    - Total historique (price_history): {total_history}")
         print("="*60 + "\n")
 
-        return f"✅ Succès : {inserted_count} nouvelles, {updated_count} mises à jour"
+        return f"Succès : {inserted_count} nouvelles, {updated_count} mises à jour, {history_count} historique"
 
     except Exception as exc:
-        print(f"[CELERY] ❌ Erreur: {exc}")
+        print(f"[CELERY] Erreur: {exc}")
         import traceback
         traceback.print_exc()
         raise self.retry(exc=exc)

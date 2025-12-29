@@ -59,3 +59,13 @@ def get_transactions_collection():
     except Exception as e:
         print(f"❌ Erreur de connexion MongoDB (transactions): {e}")
         raise
+
+def get_price_history_collection():
+    """Retourne la collection de l'historique des prix (pour les prévisions)"""
+    try:
+        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+        client.server_info()
+        return client[DB_NAME]["price_history"]
+    except Exception as e:
+        print(f"❌ Erreur de connexion MongoDB (price_history): {e}")
+        raise

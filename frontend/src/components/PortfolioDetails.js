@@ -84,16 +84,28 @@ const PortfolioDetails = () => {
   };
 
   const formatPrice = (price) => {
+    const num = typeof price === 'number' ? price : Number(price);
+    if (!Number.isFinite(num)) {
+      return '—';
+    }
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(price);
+    }).format(num);
   };
 
-  const formatPercent = (value) => {
-    return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+  const formatPercent = (value, digits = 2, withSign = true) => {
+    const num = typeof value === 'number' ? value : Number(value);
+
+    if (!Number.isFinite(num)) {
+      return '—';
+    }
+
+    const sign = withSign ? (num >= 0 ? '+' : '') : '';
+    return `${sign}${num.toFixed(digits)}%`;
   };
 
   const formatDate = (timestamp) => {
@@ -196,21 +208,21 @@ const PortfolioDetails = () => {
       <div className="tab-content">
         {activeTab === 'overview' && (
           <div className="overview-tab">
-            {allocation && (
+            {Array.isArray(allocation?.allocation) && (
               <div className="allocation-chart">
                 <h3>Allocation du portefeuille</h3>
                 <div className="allocation-items">
                   {allocation.allocation.map((item, index) => (
                     <div key={index} className="allocation-item">
                       <div className="allocation-bar" style={{ width: `${item.percentage}%` }}></div>
-                      <span>{item.crypto_symbol}: {item.percentage.toFixed(1)}%</span>
+                      <span>{item.crypto_symbol}: {formatPercent(item.percentage, 1, false)}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
             
-            {performance && performance.performance.length > 0 && (
+            {Array.isArray(performance?.performance) && performance.performance.length > 0 && (
               <div className="performance-chart">
                 <h3>Performance (30 jours)</h3>
                 <div className="performance-points">
@@ -306,7 +318,7 @@ const PortfolioDetails = () => {
           </div>
         )}
 
-        {activeTab === 'allocation' && allocation && (
+        {activeTab === 'allocation' && Array.isArray(allocation?.allocation) && (
           <div className="allocation-tab">
             <h3>Détail de l'allocation</h3>
             <div className="allocation-details">
@@ -314,7 +326,7 @@ const PortfolioDetails = () => {
                 <div key={index} className="allocation-detail-item">
                   <div className="allocation-header">
                     <span className="crypto-symbol">{item.crypto_symbol}</span>
-                    <span className="allocation-percentage">{item.percentage.toFixed(1)}%</span>
+                    <span className="allocation-percentage">{formatPercent(item.percentage, 1, false)}</span>
                   </div>
                   <div className="allocation-values">
                     <span>Valeur: {formatPrice(item.value)}</span>
@@ -329,7 +341,7 @@ const PortfolioDetails = () => {
         {activeTab === 'performance' && performance && (
           <div className="performance-tab">
             <h3>Performance historique</h3>
-            {performance.performance.length === 0 ? (
+            {!Array.isArray(performance.performance) || performance.performance.length === 0 ? (
               <div className="empty-state">
                 <p>Aucune donnée de performance disponible</p>
               </div>

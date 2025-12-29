@@ -157,3 +157,8 @@ class PerformancePoint(BaseModel):
 class PortfolioPerformanceResponse(BaseModel):
     points: list[PerformancePoint]
     count: int
+
+
+class PortfolioListResponse(BaseModel):
+    portfolios: list[Portfolio]
+    count: int

@@ -65,11 +65,14 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('[REGISTER] handleSubmit appelé');
     
     if (!validateForm()) {
+      console.log('[REGISTER] Validation échouée');
       return;
     }
 
+    console.log('[REGISTER] Validation OK, appel API...');
     setLoading(true);
 
     try {
@@ -78,17 +81,21 @@ const Register = () => {
         formData.email,
         formData.password
       );
+      console.log('[REGISTER] Résultat reçu:', result);
 
-      if (result.success) {
+      if (result && result.success) {
+        console.log('[REGISTER] Inscription réussie');
         setSuccess(true);
         // Rediriger vers la page de connexion après 2 secondes
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       } else {
-        setErrors({ general: result.error });
+        console.log('[REGISTER] Échec inscription:', result?.error);
+        setErrors({ general: result?.error || 'Erreur inscription' });
       }
     } catch (err) {
+      console.error('[REGISTER] Exception:', err);
       setErrors({ general: 'Une erreur est survenue' });
     } finally {
       setLoading(false);

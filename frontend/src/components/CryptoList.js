@@ -68,10 +68,10 @@ const CryptoList = () => {
 
   return (
     <div className="crypto-list-container">
-      <div class="title-container">
-  <span class="emoji">💰</span>
-  <span class="title-gradient">Liste des Cryptomonnaies</span>
-</div>
+      <div className="title-container">
+        <span className="emoji">💰</span>
+        <span className="title-gradient">Liste des Cryptomonnaies</span>
+      </div>
 
        <p className="page-subtitle">
         Suivez les prix en temps réel des principales cryptomonnaies

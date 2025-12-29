@@ -14,14 +14,19 @@ const api = axios.create({
 const authService = {
   // Inscription
   register: async (username, email, password) => {
+    console.log('[AUTH] Tentative d\'inscription pour:', username, email);
     try {
+      console.log('[AUTH] Envoi requête POST vers:', `${API_URL}/register`);
       const response = await api.post('/register', {
         username,
         email,
         password
       });
+      console.log('[AUTH] Inscription réussie:', response.data);
       return { success: true, data: response.data };
     } catch (error) {
+      console.error('[AUTH] Erreur inscription:', error);
+      console.error('[AUTH] Détails:', error.response?.data);
       return {
         success: false,
         error: error.response?.data?.detail || 'Erreur lors de l\'inscription'
@@ -31,24 +36,34 @@ const authService = {
 
   // Connexion
   login: async (username, password) => {
+    console.log('[AUTH] Tentative de connexion pour:', username);
     try {
       const formData = new URLSearchParams();
       formData.append('username', username);
       formData.append('password', password);
 
+      console.log('[AUTH] Envoi requête POST vers:', `${API_URL}/login`);
       const response = await axios.post(`${API_URL}/login`, formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
 
+      console.log('[AUTH] Réponse reçue:', response.data);
+
       if (response.data.access_token) {
         // Stocker le token et les infos utilisateur
         localStorage.setItem('token', response.data.access_token);
         localStorage.setItem('username', username);
+        console.log('[AUTH] Token stocké avec succès');
         return { success: true, data: response.data };
+      } else {
+        console.log('[AUTH] Pas de token dans la réponse');
+        return { success: false, error: 'Réponse invalide du serveur' };
       }
     } catch (error) {
+      console.error('[AUTH] Erreur de connexion:', error);
+      console.error('[AUTH] Détails:', error.response?.data);
       return {
         success: false,
         error: error.response?.data?.detail || 'Identifiants incorrects'

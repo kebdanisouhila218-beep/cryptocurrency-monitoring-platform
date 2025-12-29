@@ -27,8 +27,11 @@ services:
     container_name: fastapi
     ports:
       - "8000:8000"
+    volumes:
+      - ./api:/app
     depends_on:
       - mongo
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     environment:
       - MONGO_HOST=mongo
       - MONGO_PORT=27017

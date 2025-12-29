@@ -11,6 +11,13 @@ import Profile from './components/Profile';
 import Alerts from './components/Alerts';
 import Portfolio from './components/Portfolio';
 import PortfolioDetails from './components/PortfolioDetails';
+import VirtualPortfolioList from './components/VirtualPortfolioList';
+import VirtualPortfolioDetails from './components/VirtualPortfolioDetails';
+import PerformanceTracker from './components/PerformanceTracker';
+import Predictions from './components/Predictions';
+import TechnicalIndicators from './components/TechnicalIndicators';
+import CandlestickChart from './components/AdvancedCharts/CandlestickChart';
+import HeatmapChart from './components/AdvancedCharts/HeatmapChart';
 import ProtectedRoute from './components/ProtectedRoute';
 import Toast from './components/Toast';
 import './App.css';
@@ -73,6 +80,69 @@ function App() {
             element={
               <ProtectedRoute>
                 <PortfolioDetails />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Routes Portfolio Virtuel */}
+          <Route 
+            path="/virtual-portfolio" 
+            element={
+              <ProtectedRoute>
+                <VirtualPortfolioList />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/virtual-portfolio/:portfolioId" 
+            element={
+              <ProtectedRoute>
+                <VirtualPortfolioDetails />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/performance" 
+            element={
+              <ProtectedRoute>
+                <PerformanceTracker />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/predictions" 
+            element={
+              <ProtectedRoute>
+                <Predictions />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/technical-indicators" 
+            element={
+              <ProtectedRoute>
+                <TechnicalIndicators />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/candlestick" 
+            element={
+              <ProtectedRoute>
+                <CandlestickChart />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/heatmap" 
+            element={
+              <ProtectedRoute>
+                <HeatmapChart />
               </ProtectedRoute>
             } 
           />
