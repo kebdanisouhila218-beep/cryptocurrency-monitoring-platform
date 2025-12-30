@@ -54,6 +54,9 @@ const Toast = () => {
           key={toast.id}
           className={`toast toast-${toast.type}`}
           onClick={() => removeToast(toast.id)}
+          onKeyDown={(e) => e.key === 'Enter' && removeToast(toast.id)}
+          role="alert"
+          tabIndex={0}
         >
           <span className="toast-icon">{getIcon(toast.type)}</span>
           <span className="toast-message">{toast.message}</span>

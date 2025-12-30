@@ -121,13 +121,13 @@ def calculate_macd(
     ema_slow = prices_series.ewm(span=slow_period, adjust=False).mean()
     
     # Calculer la ligne MACD
-    macd_line = ema_fast - ema_slow
+    macd_line = ema_fast.sub(ema_slow)
     
     # Calculer la ligne de signal (EMA du MACD)
     signal_line = macd_line.ewm(span=signal_period, adjust=False).mean()
     
     # Calculer l'histogramme
-    histogram = macd_line - signal_line
+    histogram = macd_line.sub(signal_line)
     
     # Valeurs actuelles
     current_macd = float(macd_line.iloc[-1])
@@ -203,8 +203,8 @@ def calculate_bollinger_bands(
     std_dev = prices_series.rolling(window=period).std()
     
     # Calculer les bandes supérieure et inférieure
-    upper_band = middle_band + (num_std * std_dev)
-    lower_band = middle_band - (num_std * std_dev)
+    upper_band = middle_band.add(num_std * std_dev)
+    lower_band = middle_band.sub(num_std * std_dev)
     
     # Valeurs actuelles
     current_price = prices[-1]

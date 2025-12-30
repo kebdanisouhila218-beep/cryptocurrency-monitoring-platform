@@ -26,12 +26,13 @@ services:
     build: ./api
     container_name: fastapi
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./api:/app
     depends_on:
       - mongo
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    # Note: Docker expose sur 8001 externe, 8000 interne
     environment:
       - MONGO_HOST=mongo
       - MONGO_PORT=27017
@@ -121,5 +122,87 @@ services:
         until timeout 1 curl -f http://mongo:27017/ 2>/dev/null; do sleep 1; done &&
         python -m pytest test_integration_api.py -v
       "
+  # ===== MONITORING =====
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # MongoDB Exporter pour Prometheus
+  mongodb-exporter:
+    image: percona/mongodb_exporter:0.39
+    container_name: mongodb-exporter
+    ports:
+      - "9216:9216"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  # Redis Exporter pour Prometheus
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.55.0
+    container_name: redis-exporter
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # Node Exporter pour métriques système
+  node-exporter:
+    image: prom/node-exporter:v1.6.1
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+
+  # ===== ANALYSE QUALITÉ =====
+  sonarqube:
+    image: sonarqube:10.3-community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    restart: unless-stopped
+
 volumes:
   mongodb_data:
+  prometheus_data:
+  grafana_data:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:

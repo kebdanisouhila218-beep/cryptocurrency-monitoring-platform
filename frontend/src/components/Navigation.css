@@ -1,5 +1,33 @@
 /* Navigation.css - Design Moderne avec Animations */
 
+/* Style spécial pour le lien Admin */
+.nav-link.admin-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  border-radius: 8px;
+  padding: 8px 12px !important;
+}
+
+.nav-link.admin-link:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: scale(1.05);
+}
+
+.nav-link.admin-link.active {
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Admin link en mode nuit - texte toujours blanc */
+body.dark-mode .nav-link.admin-link {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  color: white !important;
+}
+
+body.dark-mode .nav-link.admin-link .nav-icon,
+body.dark-mode .nav-link.admin-link .nav-text {
+  color: white !important;
+}
+
 .navbar {
   background: var(--bg-card);
   backdrop-filter: blur(20px);

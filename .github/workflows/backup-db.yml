@@ -1,0 +1,76 @@
+# .github/workflows/backup-db.yml
+# Sauvegarde automatique de la base de données MongoDB
+
+name: Database Backup
+
+on:
+  # Sauvegarde quotidienne à 2h du matin (UTC)
+  schedule:
+    - cron: '0 2 * * *'
+  
+  # Déclenchement manuel
+  workflow_dispatch:
+    inputs:
+      collections:
+        description: 'Collections à sauvegarder (vide = toutes)'
+        required: false
+        default: ''
+
+env:
+  MONGO_HOST: ${{ secrets.MONGO_HOST }}
+  MONGO_PORT: ${{ secrets.MONGO_PORT }}
+
+jobs:
+  backup:
+    name: Backup MongoDB
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install pymongo
+      
+      - name: Run backup script
+        run: |
+          cd scripts
+          if [ -n "${{ github.event.inputs.collections }}" ]; then
+            python backup_db.py backup --collections ${{ github.event.inputs.collections }}
+          else
+            python backup_db.py backup
+          fi
+        env:
+          MONGO_HOST: ${{ secrets.MONGO_HOST || 'localhost' }}
+          MONGO_PORT: ${{ secrets.MONGO_PORT || '27017' }}
+      
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mongodb-backup-${{ github.run_number }}
+          path: backups/
+          retention-days: 30
+      
+      - name: Cleanup old backups
+        run: |
+          cd scripts
+          python backup_db.py cleanup --keep 5
+      
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Backup completed successfully"
+          echo "📅 Date: $(date)"
+          echo "📁 Backup stored as artifact"
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Backup failed!"
+          echo "📅 Date: $(date)"

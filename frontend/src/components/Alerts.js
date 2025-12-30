@@ -434,8 +434,8 @@ const Alerts = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteModal.show && (
-        <div className="modal-overlay" onClick={() => setDeleteModal({ show: false, alertId: null })}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setDeleteModal({ show: false, alertId: null })} onKeyDown={(e) => e.key === 'Escape' && setDeleteModal({ show: false, alertId: null })} tabIndex={-1}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()} aria-modal="true">
             <h3>🗑️ Supprimer l'alerte ?</h3>
             <p>Cette action est irréversible. Voulez-vous vraiment supprimer cette alerte ?</p>
             <div className="modal-actions">

@@ -7,7 +7,10 @@ from email.mime.multipart import MIMEMultipart
 from typing import Dict, Optional
 import os
 from datetime import datetime
+from dotenv import load_dotenv
 
+# Charger les variables d'environnement depuis .env
+load_dotenv()
 
 # Configuration SMTP (depuis variables d'environnement)
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
@@ -19,6 +22,10 @@ SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Crypto Monitoring")
 
 # Mode debug (n'envoie pas vraiment l'email)
 EMAIL_DEBUG_MODE = os.getenv("EMAIL_DEBUG_MODE", "true").lower() == "true"
+
+# Debug: afficher la configuration au chargement
+print(f"[EMAIL CONFIG] SMTP_USER: {SMTP_USER}")
+print(f"[EMAIL CONFIG] EMAIL_DEBUG_MODE: {EMAIL_DEBUG_MODE}")
 
 
 def get_alert_email_template(alert_data: Dict) -> str:
@@ -320,6 +327,62 @@ def send_test_email(recipient_email: str) -> Dict:
     
     print(f"[EMAIL] 🧪 Envoi d'un email de test à {recipient_email}")
     return send_alert_email(recipient_email, test_alert_data)
+
+
+def send_email(to_email: str, subject: str, body: str) -> bool:
+    """
+    Envoie un email simple (pour les broadcasts admin).
+    
+    Args:
+        to_email: Adresse email du destinataire
+        subject: Sujet de l'email
+        body: Corps du message
+    
+    Returns:
+        True si envoyé (ou mode debug), False sinon
+    """
+    print(f"\n[EMAIL] 📧 Envoi email à: {to_email}")
+    print(f"[EMAIL] Sujet: {subject}")
+    
+    # Mode debug - simuler l'envoi
+    if EMAIL_DEBUG_MODE:
+        print(f"[EMAIL] ⚠️ Mode DEBUG activé - Email simulé (non envoyé réellement)")
+        print(f"[EMAIL] Destinataire: {to_email}")
+        print(f"[EMAIL] Sujet: {subject}")
+        print(f"[EMAIL] Message: {body[:100]}...")
+        return True
+    
+    # Vérifier la configuration SMTP
+    if not SMTP_USER or not SMTP_PASSWORD:
+        print(f"[EMAIL] ⚠️ Configuration SMTP manquante - Email simulé")
+        print(f"[EMAIL] Destinataire: {to_email}")
+        print(f"[EMAIL] Sujet: {subject}")
+        print(f"[EMAIL] Message: {body[:100]}...")
+        return True
+    
+    try:
+        # Créer le message
+        message = MIMEMultipart()
+        message["Subject"] = subject
+        message["From"] = f"{SMTP_FROM_NAME} <{SMTP_FROM_EMAIL}>"
+        message["To"] = to_email
+        
+        message.attach(MIMEText(body, "plain"))
+        
+        # Envoyer l'email
+        context = ssl.create_default_context()
+        
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls(context=context)
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_FROM_EMAIL, to_email, message.as_string())
+        
+        print(f"[EMAIL] ✅ Email envoyé à {to_email}")
+        return True
+        
+    except Exception as e:
+        print(f"[EMAIL] ❌ Erreur: {e}")
+        return False
 
 
 if __name__ == "__main__":

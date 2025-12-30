@@ -1,0 +1,2 @@
+# Tests de performance - Dépendances
+locust>=2.15.0

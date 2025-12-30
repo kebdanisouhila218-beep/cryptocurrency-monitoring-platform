@@ -14,7 +14,9 @@ from routes.predictions import router as predictions_router
 from routes.portfolio import router as portfolio_router
 from routes.virtual_portfolio import router as virtual_portfolio_router
 from routes.analytics import router as analytics_router
+from routes.admin import router as admin_router
 from services.alert_checker import check_alerts
+from metrics import PrometheusMiddleware, get_metrics, update_system_metrics, record_price_collected, CRYPTO_PRICES_COLLECTED
 from auth import (
     authenticate_user,
     create_access_token,
@@ -41,6 +43,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ===== PROMETHEUS MIDDLEWARE =====
+app.add_middleware(PrometheusMiddleware)
 
 ALERT_CHECKER_ENABLED = os.getenv("ALERT_CHECKER_ENABLED", "true").lower() == "true"
 ALERT_CHECK_INTERVAL_SECONDS = int(os.getenv("ALERT_CHECK_INTERVAL_SECONDS", "60"))
@@ -70,6 +75,7 @@ app.include_router(predictions_router)
 app.include_router(portfolio_router)
 app.include_router(virtual_portfolio_router)
 app.include_router(analytics_router)
+app.include_router(admin_router)
 
 def _alert_checker_loop():
     while True:
@@ -211,6 +217,10 @@ async def get_prices(
         
         print(f"[API] ✅ {len(prices)} cryptos retournées")
         
+        # Enregistrer les métriques Prometheus pour chaque crypto
+        for p in prices:
+            record_price_collected(p.get("symbol", "UNKNOWN"))
+        
         # Afficher les 5 premières pour debug
         if len(prices) > 0:
             print(f"[API] 📊 Top 5 cryptos:")
@@ -295,7 +305,8 @@ async def root():
             "prices": "/prices (🔒 protected)",
             "latest": "/prices/latest (🔒 protected)",
             "admin": "/admin/users (🔒 admin only)",
-            "alerts": "/alerts (🔒 protected)"
+            "alerts": "/alerts (🔒 protected)",
+            "metrics": "/metrics (📊 monitoring)"
         }
     }
 
@@ -306,6 +317,14 @@ async def health_check():
     ✅ Health check de l'API
     """
     return {"status": "✅ API is healthy", "version": "2.0.0"}
+
+
+@app.get("/metrics", tags=["Monitoring"])
+async def metrics():
+    """
+    📊 Métriques Prometheus
+    """
+    return get_metrics()
 
 
 @app.get("/public/stats", tags=["Public"])

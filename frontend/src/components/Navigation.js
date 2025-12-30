@@ -10,6 +10,7 @@ const Navigation = () => {
   const [isRotating, setIsRotating] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   const [dataDropdownOpen, setDataDropdownOpen] = useState(false);
   const [analysisDropdownOpen, setAnalysisDropdownOpen] = useState(false);
@@ -51,11 +52,18 @@ const Navigation = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const checkAuth = () => {
+  const checkAuth = async () => {
     const authenticated = authService.isAuthenticated();
     setIsAuthenticated(authenticated);
     if (authenticated) {
       setUsername(authService.getUsername() || 'Utilisateur');
+      // Récupérer le rôle depuis l'API
+      try {
+        const user = await authService.getCurrentUser();
+        setUserRole(user?.role || 'user');
+      } catch (err) {
+        setUserRole('user');
+      }
     }
   };
 
@@ -114,34 +122,15 @@ const Navigation = () => {
                   </Link>
                 </li>
 
-                <li className="nav-item dropdown" ref={dataDropdownRef}>
-                  <button
-                    type="button"
-                    className={`nav-link dropdown-toggle ${isRouteActive(['/dashboard', '/performance']) ? 'active' : ''}`}
-                    onClick={() => {
-                      setDataDropdownOpen(!dataDropdownOpen);
-                      setAnalysisDropdownOpen(false);
-                      setUserDropdownOpen(false);
-                    }}
+                <li className="nav-item">
+                  <Link
+                    to="/dashboard"
+                    className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
+                    onClick={closeAllDropdowns}
                   >
                     <span className="nav-icon">📊</span>
-                    <span className="nav-text">Données</span>
-                    <span className={`arrow ${dataDropdownOpen ? 'open' : ''}`}>▼</span>
-                  </button>
-
-                  {dataDropdownOpen && (
-                    <div className="dropdown-menu">
-                      <Link to="/dashboard" className="dropdown-item" onClick={closeAllDropdowns}>
-                        <span>📊</span>
-                        <span>Dashboard</span>
-                      </Link>
-
-                      <Link to="/performance" className="dropdown-item" onClick={closeAllDropdowns}>
-                        <span>📈</span>
-                        <span>Performances</span>
-                      </Link>
-                    </div>
-                  )}
+                    <span className="nav-text">Dashboard</span>
+                  </Link>
                 </li>
 
                 <li className="nav-item dropdown" ref={analysisDropdownRef}>
@@ -202,6 +191,20 @@ const Navigation = () => {
                     <span className="nav-text">Portfolio Virtuel</span>
                   </Link>
                 </li>
+
+                {/* Lien Admin - visible uniquement pour les admins */}
+                {userRole === 'admin' && (
+                  <li className="nav-item">
+                    <Link
+                      to="/admin"
+                      className={`nav-link admin-link ${location.pathname.startsWith('/admin') ? 'active' : ''}`}
+                      onClick={closeAllDropdowns}
+                    >
+                      <span className="nav-icon">🛡️</span>
+                      <span className="nav-text">Admin</span>
+                    </Link>
+                  </li>
+                )}
 
                 <li className="nav-item dropdown" ref={userDropdownRef}>
                   <button

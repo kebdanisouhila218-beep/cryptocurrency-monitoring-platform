@@ -172,8 +172,8 @@ const VirtualPortfolioList = () => {
       )}
 
       {showCreateModal && (
-        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)} onKeyDown={(e) => e.key === 'Escape' && setShowCreateModal(false)} tabIndex={-1}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} aria-modal="true">
             <h3>➕ Créer un nouveau portfolio</h3>
             <form onSubmit={handleCreatePortfolio}>
               <div className="form-group">

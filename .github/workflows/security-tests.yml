@@ -1,0 +1,250 @@
+name: Security Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 3 AM UTC
+    - cron: '0 3 * * *'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:6
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        pip install -r api/requirements.txt
+        pip install -r tests/security/requirements.txt
+    
+    - name: Start API
+      run: |
+        cd api
+        uvicorn main:app --host 0.0.0.0 --port 8000 &
+        sleep 10
+    
+    - name: Run basic security tests
+      run: |
+        python tests/security/zap_scan.py --no-zap --target http://localhost:8000
+    
+    - name: Install Snyk
+      run: |
+        npm install -g snyk
+    
+    - name: Authenticate Snyk
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      run: |
+        if [ -n "$SNYK_TOKEN" ]; then
+          snyk auth $SNYK_TOKEN
+        else
+          echo "Snyk token not found, skipping Snyk scan"
+          exit 0
+        fi
+    
+    - name: Run Snyk Python scan
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      run: |
+        if [ -n "$SNYK_TOKEN" ]; then
+          cd api
+          snyk test --file=requirements.txt --json=../results/snyk_python.json || true
+        fi
+    
+    - name: Run Snyk Node.js scan
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      run: |
+        if [ -n "$SNYK_TOKEN" ]; then
+          cd frontend
+          snyk test --json=../results/snyk_nodejs.json || true
+        fi
+    
+    - name: Run Snyk code scan
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      run: |
+        if [ -n "$SNYK_TOKEN" ]; then
+          snyk code test --json=results/snyk_code.json || true
+        fi
+    
+    - name: Upload security results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-results
+        path: results/
+    
+    - name: OWASP ZAP Baseline Scan
+      uses: zaproxy/action-baseline@v0.7.0
+      with:
+        target: 'http://localhost:8000'
+        rules_file_name: '.zap/rules.tsv'
+        cmd_options: '-a'
+        fail_on_warning: false
+        fail_on_error: false
+
+  docker-security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Build Docker images
+      run: |
+        docker build -t crypto-tracker-api ./api
+        docker build -t crypto-tracker-collector ./collector
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'crypto-tracker-api'
+        format: 'sarif'
+        output: 'results/trivy-api.sarif'
+    
+    - name: Run Trivy on collector image
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'crypto-tracker-collector'
+        format: 'sarif'
+        output: 'results/trivy-collector.sarif'
+    
+    - name: Upload Trivy results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: trivy-results
+        path: results/
+    
+    - name: Upload SARIF file to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'results/trivy-api.sarif'
+
+  security-report:
+    runs-on: ubuntu-latest
+    needs: [security-scan, docker-security]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: results/
+    
+    - name: Generate security report
+      run: |
+        echo "# Security Test Report" > results/security_report.md
+        echo "Generated on: $(date)" >> results/security_report.md
+        echo "" >> results/security_report.md
+        echo "## Basic Security Tests" >> results/security_report.md
+        echo "✅ Basic security tests completed" >> results/security_report.md
+        echo "" >> results/security_report.md
+        echo "## Snyk Scans" >> results/security_report.md
+        if [ -f results/snyk_python.json ]; then
+          echo "✅ Python dependencies scanned" >> results/security_report.md
+        fi
+        if [ -f results/snyk_nodejs.json ]; then
+          echo "✅ Node.js dependencies scanned" >> results/security_report.md
+        fi
+        if [ -f results/snyk_code.json ]; then
+          echo "✅ Source code scanned" >> results/security_report.md
+        fi
+        echo "" >> results/security_report.md
+        echo "## Docker Security" >> results/security_report.md
+        if [ -f results/trivy-api.sarif ]; then
+          echo "✅ Docker API image scanned" >> results/security_report.md
+        fi
+        if [ -f results/trivy-collector.sarif ]; then
+          echo "✅ Docker collector image scanned" >> results/security_report.md
+        fi
+    
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-report
+        path: results/security_report.md
+
+  security-gate:
+    runs-on: ubuntu-latest
+    needs: [security-scan, docker-security]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: security-results
+        path: results/
+    
+    - name: Check critical vulnerabilities
+      run: |
+        python -c "
+        import json
+        import os
+        
+        critical_vulns = 0
+        high_vulns = 0
+        
+        # Check Snyk Python results
+        if os.path.exists('results/snyk_python.json'):
+            with open('results/snyk_python.json', 'r') as f:
+                data = json.load(f)
+                for vuln in data.get('vulnerabilities', []):
+                    severity = vuln.get('severity', 'low')
+                    if severity == 'critical':
+                        critical_vulns += 1
+                    elif severity == 'high':
+                        high_vulns += 1
+        
+        # Check Snyk Node.js results
+        if os.path.exists('results/snyk_nodejs.json'):
+            with open('results/snyk_nodejs.json', 'r') as f:
+                data = json.load(f)
+                for vuln in data.get('vulnerabilities', []):
+                    severity = vuln.get('severity', 'low')
+                    if severity == 'critical':
+                        critical_vulns += 1
+                    elif severity == 'high':
+                        high_vulns += 1
+        
+        print(f'Critical vulnerabilities: {critical_vulns}')
+        print(f'High vulnerabilities: {high_vulns}')
+        
+        if critical_vulns > 0:
+            print('❌ CRITICAL vulnerabilities found!')
+            exit(1)
+        elif high_vulns > 5:
+            print('❌ Too many HIGH vulnerabilities found!')
+            exit(1)
+        else:
+            print('✅ Security gate passed')
+        "

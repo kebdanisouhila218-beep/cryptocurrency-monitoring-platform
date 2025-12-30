@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "projectName": "cryptocurrency-monitoring-platform",
+  "description": "Configuration Snyk pour l'analyse de sécurité des dépendances",
+  "targets": {
+    "python": {
+      "path": "api/requirements.txt",
+      "type": "pip"
+    },
+    "nodejs": {
+      "path": "frontend/package.json",
+      "type": "npm"
+    },
+    "docker": {
+      "files": [
+        "api/Dockerfile",
+        "collector/Dockerfile"
+      ]
+    }
+  },
+  "severity_threshold": "medium",
+  "fail_on": ["high", "critical"],
+  "ignore": [],
+  "policies": {
+    "auto_fix": false,
+    "pr_check": true
+  }
+}

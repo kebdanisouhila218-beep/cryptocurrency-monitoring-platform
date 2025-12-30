@@ -351,8 +351,8 @@ const VirtualPortfolioDetails = () => {
       )}
 
       {showTransactionModal && (
-        <div className="modal-overlay" onClick={() => setShowTransactionModal(false)}>
-          <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setShowTransactionModal(false)} onKeyDown={(e) => e.key === 'Escape' && setShowTransactionModal(false)} tabIndex={-1}>
+          <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} aria-modal="true">
             <h3>➕ Nouvelle Transaction</h3>
             <form onSubmit={handleTransactionSubmit}>
               <div className="form-group">

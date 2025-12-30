@@ -29,6 +29,18 @@ except ImportError:
         EMAIL_SERVICE_AVAILABLE = False
         print("[CHECKER] ⚠️ Service email non disponible")
 
+# Import des métriques Prometheus
+try:
+    from metrics import record_alert_triggered
+    METRICS_AVAILABLE = True
+except ImportError:
+    try:
+        from ..metrics import record_alert_triggered
+        METRICS_AVAILABLE = True
+    except ImportError:
+        METRICS_AVAILABLE = False
+        print("[CHECKER] ⚠️ Métriques Prometheus non disponibles")
+
 # Configuration MongoDB
 MONGO_URI = os.getenv("MONGO_URI")
 if not MONGO_URI:
@@ -159,6 +171,11 @@ def trigger_alert(db, alert: dict, current_price: float) -> bool:
             print(f"[CHECKER]    - Prix cible: ${alert['target_price']:.2f}")
             print(f"[CHECKER]    - Prix actuel: ${current_price:.2f}")
             print(f"[CHECKER]    - User ID: {alert['user_id']}")
+            
+            # Enregistrer la métrique Prometheus
+            if METRICS_AVAILABLE:
+                record_alert_triggered(alert['crypto_symbol'], alert['alert_type'])
+                print(f"[CHECKER] 📊 Métrique Prometheus enregistrée")
 
             user_id = alert.get("user_id")
             

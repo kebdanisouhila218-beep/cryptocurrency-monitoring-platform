@@ -20,6 +20,7 @@ import CandlestickChart from './components/AdvancedCharts/CandlestickChart';
 import HeatmapChart from './components/AdvancedCharts/HeatmapChart';
 import ProtectedRoute from './components/ProtectedRoute';
 import Toast from './components/Toast';
+import { AdminDashboard, AdminUsers, AdminAlerts, AdminNotifications } from './components/Admin';
 import './App.css';
 
 function App() {
@@ -147,6 +148,40 @@ function App() {
             } 
           />
           
+          {/* Routes Admin */}
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/users" 
+            element={
+              <ProtectedRoute>
+                <AdminUsers />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/alerts" 
+            element={
+              <ProtectedRoute>
+                <AdminAlerts />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/notifications" 
+            element={
+              <ProtectedRoute>
+                <AdminNotifications />
+              </ProtectedRoute>
+            } 
+          />
+
           {/* Route par défaut */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
