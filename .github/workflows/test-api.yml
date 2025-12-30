@@ -6,6 +6,7 @@ on: [push, pull_request]
 jobs:
   test-api:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -15,6 +16,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -23,6 +25,17 @@ jobs:
           pip install pytest
 
       - name: Run API unit tests
+        id: tests
+        continue-on-error: true
         run: |
           cd api
           python -m pytest test_api.py -v --tb=short
+
+      - name: Test Summary
+        run: |
+          if [ "${{ steps.tests.outcome }}" == "success" ]; then
+            echo "All API tests passed!"
+          else
+            echo "Some tests failed. Check the logs above."
+            exit 1
+          fi

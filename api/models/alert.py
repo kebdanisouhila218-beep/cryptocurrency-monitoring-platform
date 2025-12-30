@@ -1,9 +1,10 @@
 # api/models/alert.py - Modèles Pydantic pour les alertes de prix
 
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, Field, validator
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class AlertType(str, Enum):
@@ -18,13 +19,15 @@ class AlertBase(BaseModel):
     target_price: float = Field(..., gt=0, description="Prix cible (doit être > 0)")
     alert_type: AlertType = Field(..., description="Type d'alerte: above ou below")
     
-    @validator('crypto_symbol')
-    def crypto_symbol_uppercase(cls, v):
+    @field_validator('crypto_symbol')
+    @classmethod
+    def crypto_symbol_uppercase(cls, v: str) -> str:
         """Convertit le symbole en majuscules"""
         return v.upper().strip()
     
-    @validator('target_price')
-    def validate_price(cls, v):
+    @field_validator('target_price')
+    @classmethod
+    def validate_price(cls, v: float) -> float:
         """Valide que le prix est positif"""
         if v <= 0:
             raise ValueError('Le prix cible doit être supérieur à 0')
@@ -43,15 +46,17 @@ class AlertUpdate(BaseModel):
     alert_type: Optional[AlertType] = Field(None, description="Type d'alerte")
     is_active: Optional[bool] = Field(None, description="Alerte active ou non")
     
-    @validator('crypto_symbol')
-    def crypto_symbol_uppercase(cls, v):
+    @field_validator('crypto_symbol')
+    @classmethod
+    def crypto_symbol_uppercase(cls, v: Optional[str]) -> Optional[str]:
         """Convertit le symbole en majuscules"""
         if v is not None:
             return v.upper().strip()
         return v
     
-    @validator('target_price')
-    def validate_price(cls, v):
+    @field_validator('target_price')
+    @classmethod
+    def validate_price(cls, v: Optional[float]) -> Optional[float]:
         """Valide que le prix est positif"""
         if v is not None and v <= 0:
             raise ValueError('Le prix cible doit être supérieur à 0')
@@ -62,26 +67,24 @@ class AlertUpdate(BaseModel):
 
 class AlertInDB(AlertBase):
     """Modèle complet d'une alerte en base de données"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: str = Field(..., description="ID unique de l'alerte")
     user_id: str = Field(..., description="ID de l'utilisateur propriétaire")
     is_active: bool = Field(default=True, description="Alerte active ou non")
     created_at: datetime = Field(..., description="Date de création")
     triggered_at: Optional[datetime] = Field(None, description="Date de déclenchement")
-    
-    class Config:
-        from_attributes = True
 
 
 class AlertResponse(AlertBase):
     """Modèle de réponse pour une alerte"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: str
     user_id: str
     is_active: bool
     created_at: datetime
     triggered_at: Optional[datetime] = None
-    
-    class Config:
-        from_attributes = True
 
 
 class AlertListResponse(BaseModel):

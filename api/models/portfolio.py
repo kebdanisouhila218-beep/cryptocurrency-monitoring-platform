@@ -1,9 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class TransactionType(str, Enum):
@@ -23,14 +23,16 @@ class Portfolio(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_portfolio_name(cls, v: str) -> str:
         vv = v.strip()
         if not vv:
             raise ValueError("name must not be empty")
         return vv
 
-    @validator("holdings")
+    @field_validator("holdings")
+    @classmethod
     def validate_holdings(cls, v: Dict[str, float]) -> Dict[str, float]:
         cleaned: Dict[str, float] = {}
         for k, qty in (v or {}).items():
@@ -51,7 +53,8 @@ class PortfolioCreate(BaseModel):
     initial_balance: float = Field(10000.0, gt=0)
     is_default: bool = False
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v: str) -> str:
         return v.strip()
 
@@ -60,7 +63,8 @@ class PortfolioUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1)
     is_default: Optional[bool] = None
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return v
@@ -112,11 +116,13 @@ class TradeRequest(BaseModel):
     fee_percent: float = Field(0.0, ge=0)
     notes: Optional[str] = None
 
-    @validator("crypto_symbol")
+    @field_validator("crypto_symbol")
+    @classmethod
     def crypto_symbol_uppercase(cls, v: str) -> str:
         return v.upper().strip()
 
-    @validator("notes")
+    @field_validator("notes")
+    @classmethod
     def notes_strip(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return None

@@ -1,9 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class TransactionType(str, Enum):
@@ -23,39 +23,43 @@ class Transaction(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     notes: Optional[str] = None
 
-    @validator("portfolio_id", "user_id")
+    @field_validator("portfolio_id", "user_id")
+    @classmethod
     def strip_id(cls, v: str) -> str:
         vv = v.strip()
         if not vv:
             raise ValueError("id must not be empty")
         return vv
 
-    @validator("crypto_symbol")
+    @field_validator("crypto_symbol")
+    @classmethod
     def crypto_symbol_upper(cls, v: str) -> str:
         vv = v.strip().upper()
         if not vv:
             raise ValueError("crypto_symbol must not be empty")
         return vv
 
-    @validator("notes")
+    @field_validator("notes")
+    @classmethod
     def notes_strip(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return None
         vv = v.strip()
         return vv if vv else None
 
-    @root_validator(pre=True)
-    def compute_total_usd(cls, values: dict) -> dict:
-        qty = values.get("quantity")
-        price = values.get("price_usd")
-        total = values.get("total_usd")
+    @model_validator(mode="before")
+    @classmethod
+    def compute_total_usd(cls, values: Any) -> Any:
+        if isinstance(values, dict):
+            qty = values.get("quantity")
+            price = values.get("price_usd")
+            total = values.get("total_usd")
 
-        if total in (None, 0, 0.0) and qty is not None and price is not None:
-            try:
-                values["total_usd"] = float(qty) * float(price)
-            except Exception:
-                pass
-
+            if total in (None, 0, 0.0) and qty is not None and price is not None:
+                try:
+                    values["total_usd"] = float(qty) * float(price)
+                except Exception:
+                    pass
         return values
 
 
@@ -67,21 +71,24 @@ class TransactionCreate(BaseModel):
     price_usd: float = Field(..., gt=0)
     notes: Optional[str] = None
 
-    @validator("portfolio_id")
+    @field_validator("portfolio_id")
+    @classmethod
     def strip_portfolio_id(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return None
         vv = v.strip()
         return vv if vv else None
 
-    @validator("crypto_symbol")
+    @field_validator("crypto_symbol")
+    @classmethod
     def crypto_symbol_uppercase(cls, v: str) -> str:
         vv = v.strip().upper()
         if not vv:
             raise ValueError("crypto_symbol must not be empty")
         return vv
 
-    @validator("notes")
+    @field_validator("notes")
+    @classmethod
     def notes_strip_create(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return None

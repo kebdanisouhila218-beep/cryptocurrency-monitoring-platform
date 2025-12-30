@@ -1,7 +1,7 @@
 # api/routes/profile.py - Routes pour la gestion du profil utilisateur
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, HttpUrl, validator
+from pydantic import BaseModel, HttpUrl, field_validator
 from typing import Optional
 from pymongo import MongoClient
 from bson import ObjectId
@@ -38,8 +38,9 @@ class DiscordWebhookUpdate(BaseModel):
     """Modèle pour la mise à jour du webhook Discord"""
     discord_webhook_url: Optional[str] = None
     
-    @validator('discord_webhook_url')
-    def validate_webhook(cls, v):
+    @field_validator('discord_webhook_url')
+    @classmethod
+    def validate_webhook(cls, v: Optional[str]) -> Optional[str]:
         if v is None or v == "":
             return None
         if not validate_discord_webhook_url(v):

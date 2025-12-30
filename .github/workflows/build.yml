@@ -154,36 +154,18 @@ jobs:
     if: always()
 
     steps:
-      - name: Notify success
-        if: ${{ needs.build-collector.result == 'success' && needs.build-api.result == 'success' && needs.build-frontend.result == 'success' }}
+      - name: Build Summary
         run: |
-          echo "✅ All images built successfully!"
-          echo "Commit: ${{ github.sha }}"
-          echo "Branch: ${{ github.ref_name }}"
-
-      - name: Notify failure
-        if: ${{ needs.build-collector.result == 'failure' || needs.build-api.result == 'failure' || needs.build-frontend.result == 'failure' }}
-        run: |
-          echo "❌ Build failed!"
+          echo "📊 Build Summary"
+          echo "================"
           echo "Collector: ${{ needs.build-collector.result }}"
           echo "API: ${{ needs.build-api.result }}"
           echo "Frontend: ${{ needs.build-frontend.result }}"
-
-      - name: Send Discord notification
-        if: ${{ always() && secrets.DISCORD_WEBHOOK_URL != '' }}
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
+          echo ""
           if [ "${{ needs.build-collector.result }}" == "success" ] && \
              [ "${{ needs.build-api.result }}" == "success" ] && \
              [ "${{ needs.build-frontend.result }}" == "success" ]; then
-            STATUS="✅ SUCCESS"
-            COLOR=3066993
+            echo "✅ All images built successfully!"
           else
-            STATUS="❌ FAILED"
-            COLOR=15158332
+            echo "❌ Some builds failed!"
           fi
-          
-          curl -H "Content-Type: application/json" \
-               -d "{\"embeds\":[{\"title\":\"Docker Build $STATUS\",\"description\":\"Commit: \`${{ github.sha }}\`\nBranch: \`${{ github.ref_name }}\`\",\"color\":$COLOR}]}" \
-               $DISCORD_WEBHOOK_URL || true
