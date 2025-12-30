@@ -186,7 +186,7 @@ cd frontend && npm test
 - **Nom** : Souhila Aicha Kebdani
 - **Email** : kebdanisouhila218@gmail.com
 - **GitHub** : [@kebdanisouhila218-beep](https://github.com/kebdanisouhila218-beep)
-- **Formation** : Master 1 ILSEN - 2024/2025
+- **Formation** : Master 1 ILSEN - 2025/2026
 
 ---
 
