@@ -43,6 +43,20 @@ jobs:
         uvicorn main:app --host 0.0.0.0 --port 8000 &
         sleep 10
     
+    - name: Create results directory
+      run: mkdir -p results
+      
+    - name: Run Locust tests
+      run: |
+        locust -f tests/performance/locustfile_web.py \
+          --host=http://localhost:8000 \
+          --users 10 \
+          --spawn-rate 2 \
+          --run-time 60s \
+          --headless \
+          --html results/locust_report.html \
+          --csv results/locust_stats.csv
+    
     - name: Run basic security tests
       run: |
         python tests/security/zap_scan.py --no-zap --target http://localhost:8000
@@ -62,6 +76,9 @@ jobs:
           exit 0
         fi
     
+    - name: Create results directory
+      run: mkdir -p results
+      
     - name: Run Snyk Python scan
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -116,6 +133,9 @@ jobs:
         docker build -t crypto-tracker-api ./api
         docker build -t crypto-tracker-collector ./collector
     
+    - name: Create results directory
+      run: mkdir -p results
+      
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
