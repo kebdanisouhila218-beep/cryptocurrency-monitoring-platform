@@ -1,0 +1,63 @@
+# Kind Cluster Configuration for CryptoTracker
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: crypto-cluster
+nodes:
+  # Control plane node
+  - role: control-plane
+    kubeadmConfigPatches:
+    - kind: InitConfiguration
+      patch: |
+        nodeRegistration:
+          kubeletExtraArgs:
+            --node-labels=ingress-ready=true
+    - kind: ClusterConfiguration
+      patch: |
+        apiServer:
+          extraArgs:
+            "service-node-port-range": "30000-32767"
+            "enable-admission-plugins": "NamespaceLifecycle,LimitRanger,ServiceAccount"
+    - kind: KubeProxyConfiguration
+      patch: |
+        config:
+          proxyMode: "ipvs"
+  - role: control-plane
+    kubeadmConfigPatches:
+    - kind: InitConfiguration
+      patch: |
+        nodeRegistration:
+          kubeletExtraArgs:
+            --node-labels=ingress-ready=true
+  # Worker nodes
+  - role: worker
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+      - containerPort: 443
+        hostPort: 443
+      - containerPort: 3000
+        hostPort: 3000
+      - containerPort: 8000
+        hostPort: 8000
+      - containerPort: 9090
+        hostPort: 9090
+      - containerPort: 3001
+        hostPort: 3001
+    labels:
+      ingress-ready: true
+  - role: worker
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 8080
+      - containerPort: 443
+        hostPort: 8443
+    labels:
+      ingress-ready: true
+  - role: worker
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 8081
+      - containerPort: 443
+        hostPort: 8441
+    labels:
+      ingress-ready: true
