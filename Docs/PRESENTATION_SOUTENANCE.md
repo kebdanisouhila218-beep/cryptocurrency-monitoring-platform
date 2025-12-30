@@ -88,29 +88,12 @@ DevOps :
 ---
 
 ### Slide 6 : Architecture - Schéma
-```
-📊 Architecture Système
 
-┌─────────────┐
-│ CoinPaprika │ (API externe)
-└──────┬──────┘
-       ↓ (collecte)
-┌─────────────┐    ┌─────────────┐
-│  Collector  │ → │   MongoDB   │ (prix, users)
-│  (Celery)   │    └──────┬──────┘
-└─────────────┘           ↓
-                          ↓
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   Redis +   │ ← │ API FastAPI │ → │ React Front │
-│   Celery    │    │  (REST)     │    │  (SPA)      │
-└─────────────┘    └─────────────┘    └─────────────┘
-     ↑ (alertes)       ↑ (auth)           ↑ (UI)
-     ↓                  ↓                  ↓
-┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-│  Discord    │   │    JWT      │   │  Navigateur │
-│  Webhook    │   │  Tokens     │   │  Chrome/FF  │
-└─────────────┘   └─────────────┘   └─────────────┘
-```
+![Diagramme d'Architecture](Diagramme%20d'Architecture.png)
+
+**Diagramme de déploiement :**
+
+![Diagramme de Déploiement](Diagramme%20de%20Déploiement.png)
 
 ---
 
@@ -485,6 +468,23 @@ github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform
 🌐 Démo en ligne :
 demo.example.com (si disponible)
 ```
+
+---
+
+## 📊 Diagrammes UML disponibles
+
+| Diagramme | Fichier |
+|-----------|----------|
+| Architecture | [Diagramme d'Architecture.png](Diagramme%20d'Architecture.png) |
+| Déploiement | [Diagramme de Déploiement.png](Diagramme%20de%20Déploiement.png) |
+| Cas d'utilisation | [Diagramme de Cas d'Utilisation.png](Diagramme%20de%20Cas%20d'Utilisation.png) |
+| Classes | [Diagramme de Classes (Modèles).png](Diagramme%20de%20Classes%20(Modèles).png) |
+| Séquence Auth | [Diagramme de Séquence - Authentification.png](Diagramme%20de%20Séquence%20-%20Authentification.png) |
+| Séquence Alerte | [Diagramme de Séquence - Création d'Alerte.png](Diagramme%20de%20Séquence%20-%20Création%20d'Alerte.png) |
+| Séquence Trading | [Diagramme de Séquence - Trading Virtuel.png](Diagramme%20de%20Séquence%20-%20Trading%20Virtuel.png) |
+| Activité Trading | [Diagramme d'Activité - Flux de Trading.png](Diagramme%20d'Activité%20-%20Flux%20de%20Trading.png) |
+| État Alerte | [Diagramme d'État - Cycle de Vie d'une Alerte.png](Diagramme%20d'État%20-%20Cycle%20de%20Vie%20d'une%20Alerte.png) |
+| CI/CD Pipeline | [Diagramme CI-CD Pipeline.png](Diagramme%20CI-CD%20Pipeline.png) |
 
 ---
 

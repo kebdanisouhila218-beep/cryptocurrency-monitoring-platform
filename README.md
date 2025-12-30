@@ -60,20 +60,9 @@
 - **GitHub Actions** pour la CI/CD
 - **Tests unitaires** et d'intégration
 
-```
-┌─────────────┐
-│ CoinPaprika │
-└──────┬──────┘
-       ↓
-┌─────────────┐    ┌─────────────┐
-│  Collector  │ → │   MongoDB   │
-└─────────────┘    └──────┬──────┘
-                          ↓
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   Redis +   │ ← │ API FastAPI │ → │ React Front │
-│   Celery    │    └─────────────┘    └─────────────┘
-└─────────────┘
-```
+### Diagramme d'Architecture
+
+![Diagramme d'Architecture](Docs/Diagramme%20d'Architecture.png)
 
 ---
 
@@ -127,11 +116,26 @@ docker-compose up -d
 
 ## 📚 Documentation
 
-- 📖 [Guide d'installation](docs/INSTALLATION.md)
-- 🔌 [Documentation API](docs/API_DOCS.md)
-- 👥 [Guide utilisateur](docs/USER_GUIDE.md)
-- 🎓 [Présentation soutenance](docs/PRESENTATION_SOUTENANCE.pptx)
-- 📄 [Rapport final](docs/RAPPORT_FINAL.docx)
+- 📖 [Guide d'installation](Docs/INSTALLATION.md)
+- 🔌 [Documentation API](Docs/API_DOCS.md)
+- 👥 [Guide utilisateur](Docs/USER_GUIDE.md)
+- 🎓 [Présentation soutenance](Docs/PRESENTATION_SOUTENANCE.md)
+- 🛠️ [CI/CD Pipeline](Docs/CICD.md)
+
+### 📊 Diagrammes UML
+
+| Diagramme | Description |
+|-----------|-------------|
+| [🏗️ Architecture](Docs/Diagramme%20d'Architecture.png) | Vue des composants du système |
+| [🚀 Déploiement](Docs/Diagramme%20de%20Déploiement.png) | Infrastructure Docker/Cloud |
+| [👤 Cas d'utilisation](Docs/Diagramme%20de%20Cas%20d'Utilisation.png) | Fonctionnalités utilisateur |
+| [📊 Classes](Docs/Diagramme%20de%20Classes%20(Modèles).png) | Modèles de données |
+| [🔐 Séquence Auth](Docs/Diagramme%20de%20Séquence%20-%20Authentification.png) | Flux d'authentification |
+| [🔔 Séquence Alerte](Docs/Diagramme%20de%20Séquence%20-%20Création%20d'Alerte.png) | Création et déclenchement |
+| [💱 Séquence Trading](Docs/Diagramme%20de%20Séquence%20-%20Trading%20Virtuel.png) | Simulation d'achat/vente |
+| [📊 Activité Trading](Docs/Diagramme%20d'Activité%20-%20Flux%20de%20Trading.png) | Flux de trading |
+| [🔄 État Alerte](Docs/Diagramme%20d'État%20-%20Cycle%20de%20Vie%20d'une%20Alerte.png) | Cycle de vie alerte |
+| [⚙️ CI/CD Pipeline](Docs/Diagramme%20CI-CD%20Pipeline.png) | Pipeline GitHub Actions |
 
 ---
 

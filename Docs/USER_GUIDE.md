@@ -507,6 +507,21 @@ Si vous rencontrez un problème persistant :
 
 ---
 
+## 📊 Diagrammes UML
+
+Pour mieux comprendre le fonctionnement de la plateforme :
+
+| Diagramme | Description |
+|-----------|-------------|
+| [👤 Cas d'utilisation](Diagramme%20de%20Cas%20d'Utilisation.png) | Toutes les fonctionnalités utilisateur |
+| [🔐 Séquence Auth](Diagramme%20de%20Séquence%20-%20Authentification.png) | Flux de connexion |
+| [🔔 Séquence Alerte](Diagramme%20de%20Séquence%20-%20Création%20d'Alerte.png) | Création d'alertes |
+| [💱 Séquence Trading](Diagramme%20de%20Séquence%20-%20Trading%20Virtuel.png) | Simulation trading |
+| [📊 Activité Trading](Diagramme%20d'Activité%20-%20Flux%20de%20Trading.png) | Flux d'achat/vente |
+| [🔄 État Alerte](Diagramme%20d'État%20-%20Cycle%20de%20Vie%20d'une%20Alerte.png) | Cycle de vie alerte |
+
+---
+
 <div align="center">
 
 **Bon trading sur CryptoTracker ! 🚀**
