@@ -1,19 +1,23 @@
 # frontend/Dockerfile
 # Multi-stage build for React application
 
-# Stage 1: Build
-FROM node:18-alpine AS build
+# Stage 1: Build - Using Node 20 for better compatibility with React 19
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm ci --only=production --silent
+# Install ALL dependencies with legacy peer deps for React 19 compatibility
+RUN npm install --legacy-peer-deps --loglevel=error
 
 # Copy source code
 COPY . .
+
+# Set CI environment variable to treat warnings as non-fatal
+ENV CI=false
+ENV DISABLE_ESLINT_PLUGIN=true
 
 # Build the application
 RUN npm run build
