@@ -1,0 +1,365 @@
+# k8s/deployment.yml
+# Kubernetes deployment configuration for CryptoTracker
+# Usage: kubectl apply -f k8s/deployment.yml
+
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: crypto-platform
+
+---
+# MongoDB Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  namespace: crypto-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:6
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: mongodb-data
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
+
+---
+# MongoDB Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: crypto-platform
+spec:
+  selector:
+    app: mongodb
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+  type: ClusterIP
+
+---
+# Redis Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: crypto-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+
+---
+# Redis Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: crypto-platform
+spec:
+  selector:
+    app: redis
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+  type: ClusterIP
+
+---
+# API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-api
+  namespace: crypto-platform
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: crypto-api
+  template:
+    metadata:
+      labels:
+        app: crypto-api
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/kebdanisouhila218-beep/crypto-platform-api:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: MONGO_HOST
+          value: "mongodb-service"
+        - name: MONGO_PORT
+          value: "27017"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: crypto-secrets
+              key: secret-key
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# API Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: crypto-api-service
+  namespace: crypto-platform
+spec:
+  selector:
+    app: crypto-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer
+
+---
+# Collector Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-collector
+  namespace: crypto-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crypto-collector
+  template:
+    metadata:
+      labels:
+        app: crypto-collector
+    spec:
+      containers:
+      - name: collector
+        image: ghcr.io/kebdanisouhila218-beep/crypto-platform-collector:latest
+        env:
+        - name: MONGO_HOST
+          value: "mongodb-service"
+        - name: MONGO_PORT
+          value: "27017"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-frontend
+  namespace: crypto-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: crypto-frontend
+  template:
+    metadata:
+      labels:
+        app: crypto-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ghcr.io/kebdanisouhila218-beep/crypto-platform-frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: crypto-frontend-service
+  namespace: crypto-platform
+spec:
+  selector:
+    app: crypto-frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+
+---
+# Ingress (optional - for domain routing)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: crypto-ingress
+  namespace: crypto-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - crypto-platform.example.com
+    - api.crypto-platform.example.com
+    secretName: crypto-tls
+  rules:
+  - host: crypto-platform.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: crypto-frontend-service
+            port:
+              number: 80
+  - host: api.crypto-platform.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: crypto-api-service
+            port:
+              number: 80
+
+---
+# Secrets (create separately with actual values)
+# kubectl create secret generic crypto-secrets \
+#   --from-literal=secret-key=YOUR_SECRET_KEY \
+#   -n crypto-platform
+apiVersion: v1
+kind: Secret
+metadata:
+  name: crypto-secrets
+  namespace: crypto-platform
+type: Opaque
+stringData:
+  secret-key: "CHANGE_ME_IN_PRODUCTION"
+
+---
+# PersistentVolumeClaim for MongoDB
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  namespace: crypto-platform
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# HorizontalPodAutoscaler for API
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: crypto-api-hpa
+  namespace: crypto-platform
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: crypto-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

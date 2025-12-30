@@ -1,0 +1,739 @@
+{
+  "info": {
+    "name": "CryptoTracker API Tests",
+    "description": "Collection complète de tests API pour la plateforme de surveillance crypto",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "testuser"
+                },
+                {
+                  "key": "password",
+                  "value": "password123"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8000/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/auth/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cryptos",
+      "item": [
+        {
+          "name": "Get All Prices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/prices?only_popular=true",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["prices"],
+              "query": [
+                {
+                  "key": "only_popular",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Latest Prices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/prices/latest?limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["prices", "latest"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Crypto by Symbol",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/prices/BTC",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["prices", "BTC"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Predictions",
+      "item": [
+        {
+          "name": "Get BTC Predictions (30 days)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/predictions/BTC?days=30",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["predictions", "BTC"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get BTC Predictions (90 days)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/predictions/BTC?days=90",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["predictions", "BTC"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "90"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get ETH Predictions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/predictions/ETH?days=60",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["predictions", "ETH"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "60"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get BTC Indicators",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/predictions/indicators/BTC?days=90",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["predictions", "indicators", "BTC"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "90"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get ETH Indicators",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/predictions/indicators/ETH?days=90",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["predictions", "indicators", "ETH"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "90"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "item": [
+        {
+          "name": "Create Alert (Above)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"crypto_symbol\": \"BTC\",\n  \"target_price\": 100000.00,\n  \"alert_type\": \"above\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/alerts",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["alerts"]
+            }
+          }
+        },
+        {
+          "name": "Create Alert (Below)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"crypto_symbol\": \"ETH\",\n  \"target_price\": 3000.00,\n  \"alert_type\": \"below\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/alerts",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["alerts"]
+            }
+          }
+        },
+        {
+          "name": "List My Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/alerts",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["alerts"]
+            }
+          }
+        },
+        {
+          "name": "Update Alert",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"target_price\": 95000.00,\n  \"is_active\": false\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/alerts/{{alert_id}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["alerts", "{{alert_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Alert",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/alerts/{{alert_id}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["alerts", "{{alert_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Portfolio",
+      "item": [
+        {
+          "name": "Buy Crypto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"crypto_symbol\": \"BTC\",\n  \"quantity\": 0.5,\n  \"price\": 94000.00\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/portfolio/buy",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["portfolio", "buy"]
+            }
+          }
+        },
+        {
+          "name": "Sell Crypto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"crypto_symbol\": \"BTC\",\n  \"quantity\": 0.2,\n  \"price\": 95000.00\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/portfolio/sell",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["portfolio", "sell"]
+            }
+          }
+        },
+        {
+          "name": "Get Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/portfolio/balance",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["portfolio", "balance"]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/portfolio/transactions?limit=50",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["portfolio", "transactions"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Portfolio Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/portfolio/{{portfolio_id}}/stats",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["portfolio", "{{portfolio_id}}", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Candlestick Data (1h)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/analytics/candlestick/BTC?interval=1h&days=7",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["analytics", "candlestick", "BTC"],
+              "query": [
+                {
+                  "key": "interval",
+                  "value": "1h"
+                },
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Candlestick Data (1d)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/analytics/candlestick/BTC?interval=1d&days=30",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["analytics", "candlestick", "BTC"],
+              "query": [
+                {
+                  "key": "interval",
+                  "value": "1d"
+                },
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Heatmap (24h)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/analytics/heatmap?period=24h",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["analytics", "heatmap"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "24h"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Heatmap (7d)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/analytics/heatmap?period=7d",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["analytics", "heatmap"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "7d"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Compare Cryptos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"symbols\": [\"BTC\", \"ETH\", \"SOL\"],\n  \"period\": \"7d\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/analytics/compare",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["analytics", "compare"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health & Info",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "API Root",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8000/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "API Docs (Swagger)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8000/docs",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["docs"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "alert_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "portfolio_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
