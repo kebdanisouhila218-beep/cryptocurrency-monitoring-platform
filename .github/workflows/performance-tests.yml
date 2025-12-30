@@ -9,6 +9,10 @@ on:
     # Run daily at 2 AM UTC
     - cron: '0 2 * * *'
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   locust-tests:
     runs-on: ubuntu-latest
@@ -105,10 +109,12 @@ jobs:
     
     - name: Install k6
       run: |
+        sudo apt-get update
+        sudo apt-get install -y gpg
         sudo gpg -k /etc/apt/keyrings/gpg --no-default-keyring --import --keyring /etc/apt/keyrings/k6-archive-keyring.gpg https://dl.k6.io/key/gpg
         echo "deb [signed-by=/etc/apt/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
         sudo apt-get update
-        sudo apt-get install k6
+        sudo apt-get install -y k6
     
     - name: Install API dependencies
       run: |

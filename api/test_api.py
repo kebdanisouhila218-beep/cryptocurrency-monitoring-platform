@@ -37,16 +37,17 @@ def test_prices():
     app.dependency_overrides[get_collection] = lambda: mock_collection
     app.dependency_overrides[get_current_active_user] = lambda: mock_user
 
-    # Tester
-    client = TestClient(app)
-    response = client.get("/prices")
+    try:
+        # Tester
+        client = TestClient(app)
+        response = client.get("/prices")
 
-    # Vérifier
-    assert response.status_code == 200
-    data = response.json()
-    assert "prices" in data
-    assert len(data["prices"]) == 1
-    assert data["prices"][0]["symbol"] == "BTC"
-
-    # Nettoyer
-    app.dependency_overrides.clear()
+        # Vérifier
+        assert response.status_code == 200
+        data = response.json()
+        assert "prices" in data
+        assert len(data["prices"]) == 1
+        assert data["prices"][0]["symbol"] == "BTC"
+    finally:
+        # Nettoyer
+        app.dependency_overrides.clear()

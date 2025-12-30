@@ -27,7 +27,7 @@ const successfulRequests = new Counter('successful_requests');
 export const options = {
     // Scénarios de charge
     scenarios: {
-        // Test de charge progressive
+        // Test de charge progressif
         load_test: {
             executor: 'ramping-vus',
             startVUs: 0,
