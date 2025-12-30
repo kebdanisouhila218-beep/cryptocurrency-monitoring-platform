@@ -1,6 +1,9 @@
 # 🚀 CryptoTracker - Plateforme de Surveillance des Cryptomonnaies
 
-[![Tests](https://img.shields.io/github/actions/workflow/status/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/tests.yml?label=Tests)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions)
+[![Tests Collector](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test.yml)
+[![Tests API](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-api.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-api.yml)
+[![Tests Integration](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-integration-collector.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-integration-collector.yml)
+[![Build](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/build.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/build.yml)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![React](https://img.shields.io/badge/React-19+-61DAFB.svg)](https://reactjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com)
