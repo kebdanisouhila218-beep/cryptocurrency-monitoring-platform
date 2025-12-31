@@ -1,19 +1,20 @@
 # 🚀 CryptoTracker - Plateforme de Surveillance des Cryptomonnaies
 
-[![Tests Collector](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test.yml)
+[![CI/CD Pipeline](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/ci-cd.yml)
+[![Security Tests](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/security-tests.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/security-tests.yml)
+[![Performance Tests](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/performance-tests.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/performance-tests.yml)
 [![Tests API](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-api.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-api.yml)
-[![Tests Integration](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-integration-collector.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-integration-collector.yml)
-[![Build](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/build.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/build.yml)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![React](https://img.shields.io/badge/React-19+-61DAFB.svg)](https://reactjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-green.svg)](https://mongodb.com)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://docker.com)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5.svg)](https://kubernetes.io)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> 📊 **Surveillance intelligente des cryptomonnaies en temps réel avec prévisions, alertes et portfolio virtuel.**
+> 📊 **Surveillance intelligente des cryptomonnaies en temps réel avec prévisions, alertes, portfolio virtuel et panel d'administration.**
 
-[🔴 Démo Live](https://demo.example.com) | [📖 Documentation](docs/) | [🚀 Installation](#installation-rapide)
+[🔴 Démo Live](https://demo.example.com) | [📖 Documentation](Docs/) | [🚀 Installation](#installation-rapide) | [☸️ Kubernetes](Docs/KUBERNETES_DEPLOYMENT.md)
 
 ---
 
@@ -27,38 +28,66 @@
 
 ## ✨ Fonctionnalités principales
 
+### 📊 Surveillance & Analytics
 - 📊 **Surveillance 50 cryptos** en temps réel (prix, volume, market cap)
 - 🔮 **Prévisions avancées** : SMA, EMA, Régression Linéaire avec niveaux de confiance
 - 🔬 **Indicateurs techniques** : RSI, MACD, Bollinger Bands avec signaux ACHAT/VENTE
 - 📈 **Graphiques chandeliers** OHLC avec intervalles configurables
 - 🔥 **Heatmap de performance** du marché (top gainers/losers)
-- 🔔 **Alertes de prix** personnalisées (Email + Discord)
+
+### 🔔 Alertes & Notifications
+- 🔔 **Alertes de prix** personnalisées (seuil, pourcentage)
+- 📧 **Notifications Email** automatiques
+- 💬 **Webhooks Discord** pour alertes instantanées
+
+### 💼 Portfolio
 - 💼 **Portfolio virtuel** avec calcul P&L automatique
+- 📈 **Simulation trading** achat/vente sans risque
+- 📊 **Historique transactions** complet
+
+### 👤 Utilisateurs & Admin
 - 👤 **Authentification sécurisée** JWT avec hash Argon2
+- 🛡️ **Panel Admin** : gestion utilisateurs, statistiques, logs système
+- 👥 **Rôles** : Utilisateur et Administrateur
+
+### 🎨 Interface
 - 🌙 **Mode sombre** avec thème complet
 - 📱 **Responsive design** pour mobile/desktop
+
+### ☸️ DevOps & Monitoring
+- 🐳 **Docker Compose** avec 15 services
+- ☸️ **Kubernetes** ready (Minikube/Kind)
+- 📈 **Prometheus + Grafana** pour le monitoring
+- 📝 **Loki** pour les logs centralisés
+- 🔒 **Tests sécurité** : Trivy, Snyk, OWASP ZAP
+- ⚡ **Tests performance** : Locust, k6
 
 ---
 
 ## 🏗️ Architecture technique
 
-### Backend
-- **Python 3.11+** avec **FastAPI** pour l'API REST
+### Backend (Python)
+- **FastAPI** pour l'API REST haute performance
 - **MongoDB** pour le stockage des prix et données utilisateur
-- **Redis** + **Celery** pour les tâches asynchrones (collecte, alertes)
+- **Redis** + **Celery** pour les tâches asynchrones
 - **Pydantic** pour la validation des données
-- **JWT** pour l'authentification
+- **JWT** + **Argon2** pour l'authentification sécurisée
+- **Prometheus client** pour les métriques
 
-### Frontend
+### Frontend (React)
 - **React 19** avec hooks modernes
 - **Recharts** pour les graphiques interactifs
 - **Axios** pour les appels API
 - **CSS variables** pour le thème clair/sombre
+- **Panel Admin** complet
 
-### DevOps
-- **Docker Compose** pour le déploiement
-- **GitHub Actions** pour la CI/CD
-- **Tests unitaires** et d'intégration
+### DevOps & Infrastructure
+- **Docker Compose** avec 15 services
+- **Kubernetes** (Minikube/Kind) pour l'orchestration
+- **GitHub Actions** avec 12 workflows CI/CD
+- **Prometheus + Grafana** pour le monitoring
+- **Loki + Promtail** pour les logs centralisés
+- **AlertManager** pour les alertes système
 
 ### Diagramme d'Architecture
 
@@ -98,29 +127,43 @@ docker-compose up -d
 | 3-4 | Tests + JWT Auth | ✅ | 1.5 sem |
 | 5-7 | Alertes + Portfolio | ✅ | 2 sem |
 | 8-10 | Prévisions + Indicators + Viz | ✅ | 3 sem |
-| 11 | Documentation | ✅ | 1 sem |
+| 11 | Documentation + Diagrammes | ✅ | 1 sem |
+| 12 | Panel Admin + Rôles | ✅ | 1 sem |
+| 13 | Kubernetes + Monitoring avancé | ✅ | 1.5 sem |
+| 14 | CI/CD + Tests Sécurité/Performance | ✅ | 1 sem |
 
 ---
 
 ## 📊 Statistiques du projet
 
-- **Total lignes de code** : ~16,800
-- **Backend (Python)** : ~6,500 lignes
-- **Frontend (JS/JSX/CSS)** : ~9,800 lignes
-- **Tests** : ~500 lignes
-- **Fichiers** : ~100
-- **Collections MongoDB** : 6
-- **Endpoints API** : 25+
+| Métrique | Valeur |
+|----------|--------|
+| **Total lignes de code** | ~20,000+ |
+| **Backend (Python)** | ~8,500 lignes |
+| **Frontend (JS/JSX/CSS)** | ~11,000 lignes |
+| **Tests** | ~1,500 lignes |
+| **Fichiers** | ~150+ |
+| **Collections MongoDB** | 6 |
+| **Endpoints API** | **35+** |
+| **Workflows CI/CD** | **12** |
+| **Services Docker** | **15** |
+| **Diagrammes UML** | **10** |
 
 ---
 
 ## 📚 Documentation
 
+### Guides
 - 📖 [Guide d'installation](Docs/INSTALLATION.md)
 - 🔌 [Documentation API](Docs/API_DOCS.md)
 - 👥 [Guide utilisateur](Docs/USER_GUIDE.md)
 - 🎓 [Présentation soutenance](Docs/PRESENTATION_SOUTENANCE.md)
+
+### DevOps
 - 🛠️ [CI/CD Pipeline](Docs/CICD.md)
+- ☸️ [Déploiement Kubernetes](Docs/KUBERNETES_DEPLOYMENT.md)
+- 📈 [Monitoring](Docs/MONITORING.md)
+- 🧪 [Tests Performance & Sécurité](Docs/PERFORMANCE_SECURITY_TESTS.md)
 
 ### 📊 Diagrammes UML
 
@@ -143,31 +186,51 @@ docker-compose up -d
 
 ```bash
 # Tests backend
-cd api && python -m pytest
+cd api && python -m pytest -v
 
 # Tests collector
-cd collector && python -m pytest
+cd collector && python -m pytest -v
 
 # Tests frontend
 cd frontend && npm test
 
-# CI/CD automatique sur GitHub Actions
+# Tests de performance (Locust)
+locust -f tests/performance/locustfile_web.py --host=http://localhost:8000
+
+# Tests de sécurité
+python tests/security/zap_scan.py --target http://localhost:8000
 ```
 
-- **Tests unitaires** : Collector, API, Utils
-- **Tests d'intégration** : MongoDB, Redis
+### Types de tests
+| Type | Outils | Description |
+|------|--------|-------------|
+| **Unitaires** | pytest | API, Collector, Services |
+| **Intégration** | pytest + Docker | MongoDB, Redis |
+| **Performance** | Locust, k6 | Load testing, stress testing |
+| **Sécurité** | Trivy, Snyk, ZAP | Vulnérabilités, dépendances |
+| **E2E** | Playwright | Tests end-to-end |
+
 - **Coverage** : ~75%
-- **Workflows CI/CD** : 3 (tests, build, deploy)
+- **Workflows CI/CD** : 12 (tests, build, security, performance, deploy)
 
 ---
 
 ## 🛡️ Sécurité
 
-- 🔐 **Authentification JWT** avec tokens expirants
+### Authentification & Autorisation
+- 🔐 **JWT** avec tokens expirants (30 min)
 - 🔒 **Hash mots de passe** Argon2/Bcrypt
-- ✅ **Validation des entrées** avec Pydantic
-- 🌐 **CORS configuré** pour le frontend
-- 🚫 **Pas de secrets** dans le code (variables .env)
+- 👥 **Rôles** : User et Admin avec guards
+
+### Protection des données
+- ✅ **Validation** avec Pydantic
+- 🌐 **CORS** configuré strictement
+- 🚫 **Secrets** en variables d'environnement
+
+### Tests de sécurité automatisés
+- 🔍 **Trivy** : Scan des images Docker
+- 📦 **Snyk** : Vulnérabilités des dépendances
+- 🕷️ **OWASP ZAP** : Tests de pénétration
 
 ---
 
