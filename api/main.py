@@ -15,7 +15,7 @@ from routes.portfolio import router as portfolio_router
 from routes.virtual_portfolio import router as virtual_portfolio_router
 from routes.analytics import router as analytics_router
 from routes.admin import router as admin_router
-from routes.health import router as health_router
+# from routes.health import router as health_router  # Désactivé temporairement
 from services.alert_checker import check_alerts
 from metrics import PrometheusMiddleware, get_metrics, update_system_metrics, record_price_collected, CRYPTO_PRICES_COLLECTED
 from auth import (
@@ -77,7 +77,7 @@ app.include_router(portfolio_router)
 app.include_router(virtual_portfolio_router)
 app.include_router(analytics_router)
 app.include_router(admin_router)
-app.include_router(health_router)
+# app.include_router(health_router)  # Désactivé temporairement
 
 def _alert_checker_loop():
     while True:

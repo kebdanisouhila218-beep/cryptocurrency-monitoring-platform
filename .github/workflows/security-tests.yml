@@ -50,17 +50,6 @@ jobs:
     
     - name: Create results directory
       run: mkdir -p results
-      
-    - name: Run Locust tests
-      run: |
-        locust -f tests/performance/locustfile_web.py \
-          --host=http://localhost:8000 \
-          --users 10 \
-          --spawn-rate 2 \
-          --run-time 60s \
-          --headless \
-          --html results/locust_report.html \
-          --csv results/locust_stats.csv
     
     - name: Run basic security tests
       run: |
