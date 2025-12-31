@@ -149,18 +149,8 @@ jobs:
     - name: Check k6 thresholds
       run: |
         if [ -f results/k6_summary.json ]; then
-          python3 -c "
-import json
-with open('results/k6_summary.json', 'r') as f:
-    data = json.load(f)
-    metrics = data.get('metrics', {})
-    if 'http_req_duration' in metrics:
-        p95 = metrics['http_req_duration']['values'].get('p(95)', 0)
-        print(f'P95 response time: {p95}ms')
-    if 'http_req_failed' in metrics:
-        error_rate = metrics['http_req_failed']['values'].get('rate', 0)
-        print(f'Error rate: {error_rate*100:.2f}%')
-"
+          echo "k6 results found, checking thresholds..."
+          cat results/k6_summary.json | head -50
         else
           echo "k6 results file not found, skipping threshold check"
         fi
