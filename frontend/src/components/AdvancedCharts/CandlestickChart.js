@@ -5,28 +5,35 @@ import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveCon
 import analyticsService from '../../services/analyticsService';
 import './CandlestickChart.css';
 
-const CRYPTO_OPTIONS = [
-  { value: 'BTC', label: 'Bitcoin (BTC)' },
-  { value: 'ETH', label: 'Ethereum (ETH)' },
-  { value: 'BNB', label: 'BNB (BNB)' },
-  { value: 'SOL', label: 'Solana (SOL)' },
-  { value: 'XRP', label: 'Ripple (XRP)' },
-  { value: 'ADA', label: 'Cardano (ADA)' },
-  { value: 'DOGE', label: 'Dogecoin (DOGE)' },
-  { value: 'DOT', label: 'Polkadot (DOT)' },
-  { value: 'MATIC', label: 'Polygon (MATIC)' },
-  { value: 'LTC', label: 'Litecoin (LTC)' },
-  { value: 'AVAX', label: 'Avalanche (AVAX)' },
-  { value: 'LINK', label: 'Chainlink (LINK)' }
-];
-
 const CandlestickChart = () => {
   const [selectedCrypto, setSelectedCrypto] = useState('BTC');
   const [interval, setInterval] = useState('1h');
-  const [days, setDays] = useState(7);
+  const [days, setDays] = useState(14);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [cryptoOptions, setCryptoOptions] = useState([]);
+  const [loadingCryptos, setLoadingCryptos] = useState(true);
+
+  // Charger les cryptos disponibles depuis la DB
+  useEffect(() => {
+    const loadCryptos = async () => {
+      setLoadingCryptos(true);
+      const result = await analyticsService.getAvailableCryptos();
+      if (result.success && result.data.cryptos) {
+        const options = result.data.cryptos.map(crypto => ({
+          value: crypto.symbol,
+          label: `${crypto.name} (${crypto.symbol})`
+        }));
+        setCryptoOptions(options);
+        if (options.length > 0 && !options.find(o => o.value === selectedCrypto)) {
+          setSelectedCrypto(options[0].value);
+        }
+      }
+      setLoadingCryptos(false);
+    };
+    loadCryptos();
+  }, []);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -132,10 +139,20 @@ const CandlestickChart = () => {
       <div className="chart-controls">
         <div className="form-group">
           <label>Cryptomonnaie</label>
-          <select value={selectedCrypto} onChange={(e) => setSelectedCrypto(e.target.value)}>
-            {CRYPTO_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
+          <select 
+            value={selectedCrypto} 
+            onChange={(e) => setSelectedCrypto(e.target.value)}
+            disabled={loadingCryptos}
+          >
+            {loadingCryptos ? (
+              <option>Chargement...</option>
+            ) : cryptoOptions.length === 0 ? (
+              <option>Aucune crypto disponible</option>
+            ) : (
+              cryptoOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))
+            )}
           </select>
         </div>
 

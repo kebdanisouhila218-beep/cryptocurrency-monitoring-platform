@@ -2,20 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import alertService from '../services/alertService';
+import analyticsService from '../services/analyticsService';
 import './Alerts.css';
-
-const CRYPTO_OPTIONS = [
-  { value: 'BTC', label: 'Bitcoin (BTC)' },
-  { value: 'ETH', label: 'Ethereum (ETH)' },
-  { value: 'BNB', label: 'Binance Coin (BNB)' },
-  { value: 'XRP', label: 'Ripple (XRP)' },
-  { value: 'ADA', label: 'Cardano (ADA)' },
-  { value: 'SOL', label: 'Solana (SOL)' },
-  { value: 'DOGE', label: 'Dogecoin (DOGE)' },
-  { value: 'DOT', label: 'Polkadot (DOT)' },
-  { value: 'MATIC', label: 'Polygon (MATIC)' },
-  { value: 'LTC', label: 'Litecoin (LTC)' }
-];
 
 const Alerts = () => {
   // State
@@ -26,6 +14,8 @@ const Alerts = () => {
   const [toast, setToast] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ show: false, alertId: null });
   const [formLoading, setFormLoading] = useState(false);
+  const [cryptoOptions, setCryptoOptions] = useState([]);
+  const [loadingCryptos, setLoadingCryptos] = useState(true);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -80,6 +70,23 @@ const Alerts = () => {
   useEffect(() => {
     fetchAlerts();
   }, [fetchAlerts]);
+
+  // Charger les cryptos disponibles depuis la DB
+  useEffect(() => {
+    const loadCryptos = async () => {
+      setLoadingCryptos(true);
+      const result = await analyticsService.getAvailableCryptos();
+      if (result.success && result.data.cryptos) {
+        const options = result.data.cryptos.map(crypto => ({
+          value: crypto.symbol,
+          label: `${crypto.name} (${crypto.symbol})`
+        }));
+        setCryptoOptions(options);
+      }
+      setLoadingCryptos(false);
+    };
+    loadCryptos();
+  }, []);
 
   // Handle form input change
   const handleInputChange = (e) => {
@@ -259,12 +266,19 @@ const Alerts = () => {
               name="crypto_symbol"
               value={formData.crypto_symbol}
               onChange={handleInputChange}
+              disabled={loadingCryptos}
             >
-              {CRYPTO_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
+              {loadingCryptos ? (
+                <option>Chargement...</option>
+              ) : cryptoOptions.length === 0 ? (
+                <option>Aucune crypto disponible</option>
+              ) : (
+                cryptoOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

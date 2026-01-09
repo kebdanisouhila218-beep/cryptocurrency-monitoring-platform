@@ -22,6 +22,57 @@ def get_db():
     return client[DB_NAME]
 
 
+@router.get("/available-cryptos")
+async def get_available_cryptos(
+    current_user: dict = Depends(get_current_active_user)
+):
+    """
+    📋 Récupérer la liste des cryptomonnaies disponibles dans la base de données.
+    
+    🔒 Route protégée - Nécessite authentification
+    
+    **Retourne:**
+    Liste des cryptos avec leur symbole et nom
+    """
+    print(f"[ANALYTICS] 📋 Liste des cryptos demandée")
+    
+    try:
+        db = get_db()
+        collection = db["price_history"]
+        
+        pipeline = [
+            {"$group": {
+                "_id": "$symbol",
+                "name": {"$first": "$name"},
+                "symbol": {"$first": "$symbol"},
+                "count": {"$sum": 1}
+            }},
+            {"$match": {"count": {"$gte": 5}}},
+            {"$sort": {"symbol": 1}},
+            {"$project": {"_id": 0, "symbol": 1, "name": 1}}
+        ]
+        
+        cryptos = list(collection.aggregate(pipeline))
+        
+        print(f"[ANALYTICS] ✅ {len(cryptos)} cryptos disponibles")
+        
+        return {
+            "success": True,
+            "count": len(cryptos),
+            "cryptos": cryptos,
+            "user": current_user["username"]
+        }
+    
+    except Exception as e:
+        print(f"[ANALYTICS] ❌ Erreur available-cryptos: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de la récupération des cryptos: {str(e)}"
+        )
+
+
 @router.get("/candlestick/{crypto_symbol}")
 async def get_candlestick_data(
     crypto_symbol: str,
