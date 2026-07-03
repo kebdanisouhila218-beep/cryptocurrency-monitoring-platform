@@ -1,188 +1,108 @@
-# 🚀 CryptoTracker - Plateforme de Surveillance des Cryptomonnaies
+# CryptoTracker — Plateforme de Surveillance des Cryptomonnaies
 
-[![CI/CD Pipeline](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/ci-cd.yml)
-[![Security Tests](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/security-tests.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/security-tests.yml)
-[![Performance Tests](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/performance-tests.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/performance-tests.yml)
-[![Tests API](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-api.yml/badge.svg)](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform/actions/workflows/test-api.yml)
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
-[![React](https://img.shields.io/badge/React-19+-61DAFB.svg)](https://reactjs.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com)
-[![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-green.svg)](https://mongodb.com)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://docker.com)
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5.svg)](https://kubernetes.io)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+Plateforme complete de surveillance des cryptomonnaies permettant de suivre les prix en temps reel, generer des previsions, configurer des alertes automatiques et gerer un portfolio virtuel. Developpee avec FastAPI et React.
 
-> 📊 **Surveillance intelligente des cryptomonnaies en temps réel avec prévisions, alertes, portfolio virtuel et panel d'administration.**
+Projet realise dans le cadre du module AMS Application GLA (Genie Logiciel Avance), Master ILSEN, Universite d'Avignon, annee universitaire 2025-2026.
 
-[🔴 Démo Live](https://demo.example.com) | [📖 Documentation](Docs/) | [🚀 Installation](#installation-rapide) | [☸️ Kubernetes](Docs/KUBERNETES_DEPLOYMENT.md)
+Documentation complete : [`Docs/`](Docs/) — Deploiement Kubernetes : [`Docs/KUBERNETES_DEPLOYMENT.md`](Docs/KUBERNETES_DEPLOYMENT.md)
 
----
+## Vue d'ensemble
 
-## 📖 Vue d'ensemble
-
-**CryptoTracker** est une plateforme complète de surveillance des cryptomonnaies qui permet de suivre **50 cryptos en temps réel**, générer des **prévisions intelligentes**, configurer des **alertes automatiques** et gérer un **portfolio virtuel**. Développée avec **FastAPI** et **React**, elle utilise des algorithmes de **moyennes mobiles (SMA/EMA)** et **régression linéaire** pour fournir des analyses pertinentes.
+CryptoTracker suit 50 cryptomonnaies en temps reel (prix, volume, capitalisation), genere des previsions (moyennes mobiles SMA/EMA, regression lineaire) et calcule des indicateurs techniques (RSI, MACD, Bollinger Bands) avec signaux d'achat et de vente.
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
----
+## Fonctionnalites principales
 
-## ✨ Fonctionnalités principales
+**Surveillance et analyse**
+- Suivi de 50 cryptomonnaies en temps reel
+- Previsions (SMA, EMA, regression lineaire) avec niveaux de confiance
+- Indicateurs techniques (RSI, MACD, Bollinger Bands)
+- Graphiques chandeliers OHLC, heatmap de performance du marche
 
-### 📊 Surveillance & Analytics
-- 📊 **Surveillance 50 cryptos** en temps réel (prix, volume, market cap)
-- 🔮 **Prévisions avancées** : SMA, EMA, Régression Linéaire avec niveaux de confiance
-- 🔬 **Indicateurs techniques** : RSI, MACD, Bollinger Bands avec signaux ACHAT/VENTE
-- 📈 **Graphiques chandeliers** OHLC avec intervalles configurables
-- 🔥 **Heatmap de performance** du marché (top gainers/losers)
+**Alertes et notifications**
+- Alertes de prix personnalisees (seuil, pourcentage)
+- Notifications par email et webhook Discord
 
-### 🔔 Alertes & Notifications
-- 🔔 **Alertes de prix** personnalisées (seuil, pourcentage)
-- 📧 **Notifications Email** automatiques
-- 💬 **Webhooks Discord** pour alertes instantanées
+**Portfolio**
+- Portfolio virtuel avec calcul automatique des gains/pertes
+- Simulation d'achat/vente, historique des transactions
 
-### 💼 Portfolio
-- 💼 **Portfolio virtuel** avec calcul P&L automatique
-- 📈 **Simulation trading** achat/vente sans risque
-- 📊 **Historique transactions** complet
+**Utilisateurs et administration**
+- Authentification JWT avec hachage Argon2
+- Panel d'administration : gestion des utilisateurs, statistiques, logs
+- Deux roles : utilisateur et administrateur
 
-### 👤 Utilisateurs & Admin
-- 👤 **Authentification sécurisée** JWT avec hash Argon2
-- 🛡️ **Panel Admin** : gestion utilisateurs, statistiques, logs système
-- 👥 **Rôles** : Utilisateur et Administrateur
+**Interface**
+- Mode sombre, design responsive (mobile et desktop)
 
-### 🎨 Interface
-- 🌙 **Mode sombre** avec thème complet
-- 📱 **Responsive design** pour mobile/desktop
+**DevOps et monitoring**
+- Docker Compose (services API, frontend, base de donnees, monitoring)
+- Deploiement Kubernetes (Minikube / Kind)
+- Monitoring Prometheus + Grafana, logs centralises via Loki
+- Tests de securite automatises (Trivy, Snyk, OWASP ZAP) et de performance (Locust, k6)
 
-### ☸️ DevOps & Monitoring
-- 🐳 **Docker Compose** avec 15 services
-- ☸️ **Kubernetes** ready (Minikube/Kind)
-- 📈 **Prometheus + Grafana** pour le monitoring
-- 📝 **Loki** pour les logs centralisés
-- 🔒 **Tests sécurité** : Trivy, Snyk, OWASP ZAP
-- ⚡ **Tests performance** : Locust, k6
+## Architecture technique
 
----
+**Backend (Python)**
+FastAPI pour l'API REST, MongoDB pour le stockage, Redis et Celery pour les taches asynchrones, Pydantic pour la validation des donnees, authentification JWT avec hachage Argon2, client Prometheus pour les metriques.
 
-## 🏗️ Architecture technique
+**Frontend (React)**
+React avec hooks, Recharts pour les graphiques interactifs, Axios pour les appels API, theme clair/sombre, panel d'administration complet.
 
-### Backend (Python)
-- **FastAPI** pour l'API REST haute performance
-- **MongoDB** pour le stockage des prix et données utilisateur
-- **Redis** + **Celery** pour les tâches asynchrones
-- **Pydantic** pour la validation des données
-- **JWT** + **Argon2** pour l'authentification sécurisée
-- **Prometheus client** pour les métriques
-
-### Frontend (React)
-- **React 19** avec hooks modernes
-- **Recharts** pour les graphiques interactifs
-- **Axios** pour les appels API
-- **CSS variables** pour le thème clair/sombre
-- **Panel Admin** complet
-
-### DevOps & Infrastructure
-- **Docker Compose** avec 15 services
-- **Kubernetes** (Minikube/Kind) pour l'orchestration
-- **GitHub Actions** avec 12 workflows CI/CD
-- **Prometheus + Grafana** pour le monitoring
-- **Loki + Promtail** pour les logs centralisés
-- **AlertManager** pour les alertes système
-
-### Diagramme d'Architecture
+**DevOps et infrastructure**
+Docker Compose, orchestration Kubernetes (Minikube/Kind), pipeline CI/CD via GitHub Actions, monitoring Prometheus + Grafana, logs centralises Loki + Promtail, alertes systeme via AlertManager.
 
 ![Diagramme d'Architecture](Docs/Diagramme%20d'Architecture.png)
 
----
-
-## 🚀 Installation rapide
+## Installation rapide
 
 ```bash
-# 1. Cloner le projet
+# Cloner le projet
 git clone https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform.git
 cd cryptocurrency-monitoring-platform
 
-# 2. Configurer l'environnement
+# Configurer l'environnement
 cp .env.example .env
-# Éditer .env avec vos clés (SMTP, Discord, SECRET_KEY)
+# Editer .env avec vos propres cles (SMTP, Discord, SECRET_KEY)
 
-# 3. Lancer avec Docker
+# Lancer avec Docker
 docker-compose up -d
-
-# 4. Accéder à l'application
-# Frontend : http://localhost:3000
-# API : http://localhost:8000
-# Documentation API : http://localhost:8000/docs
 ```
 
-> ⚡ **Prêt en 2 minutes !** Tous les services démarreront automatiquement.
+Acces une fois demarre :
+- Frontend : http://localhost:3000
+- API : http://localhost:8000
+- Documentation API (Swagger) : http://localhost:8000/docs
 
----
+## Methodologie et sprints
 
-## 📅 Sprints réalisés
+Projet developpe en 14 sprints selon une methodologie Agile :
 
-| Sprint | Fonctionnalité | Status | Durée |
-|--------|----------------|--------|-------|
-| 1-2 | Collecte + API + React | ✅ | 2 sem |
-| 3-4 | Tests + JWT Auth | ✅ | 1.5 sem |
-| 5-7 | Alertes + Portfolio | ✅ | 2 sem |
-| 8-10 | Prévisions + Indicators + Viz | ✅ | 3 sem |
-| 11 | Documentation + Diagrammes | ✅ | 1 sem |
-| 12 | Panel Admin + Rôles | ✅ | 1 sem |
-| 13 | Kubernetes + Monitoring avancé | ✅ | 1.5 sem |
-| 14 | CI/CD + Tests Sécurité/Performance | ✅ | 1 sem |
+| Sprints | Fonctionnalite |
+|---|---|
+| 1-2 | Collecte de donnees, API, frontend React |
+| 3-4 | Tests, authentification JWT |
+| 5-7 | Alertes, portfolio virtuel |
+| 8-10 | Previsions, indicateurs techniques, visualisations |
+| 11 | Documentation et diagrammes |
+| 12 | Panel d'administration, gestion des roles |
+| 13 | Kubernetes, monitoring avance |
+| 14 | CI/CD, tests de securite et de performance |
 
----
+## Documentation
 
-## 📊 Statistiques du projet
+- [Guide d'installation](Docs/INSTALLATION.md)
+- [Documentation API](Docs/API_DOCS.md)
+- [Guide utilisateur](Docs/USER_GUIDE.md)
+- [Pipeline CI/CD](Docs/CICD.md)
+- [Deploiement Kubernetes](Docs/KUBERNETES_DEPLOYMENT.md)
+- [Monitoring](Docs/MONITORING.md)
+- [Tests de performance et de securite](Docs/PERFORMANCE_SECURITY_TESTS.md)
 
-| Métrique | Valeur |
-|----------|--------|
-| **Total lignes de code** | ~20,000+ |
-| **Backend (Python)** | ~8,500 lignes |
-| **Frontend (JS/JSX/CSS)** | ~11,000 lignes |
-| **Tests** | ~1,500 lignes |
-| **Fichiers** | ~150+ |
-| **Collections MongoDB** | 6 |
-| **Endpoints API** | **35+** |
-| **Workflows CI/CD** | **12** |
-| **Services Docker** | **15** |
-| **Diagrammes UML** | **10** |
+Diagrammes UML disponibles dans `Docs/` : architecture, deploiement, cas d'utilisation, classes, sequences (authentification, creation d'alerte, trading virtuel), activite, etats, pipeline CI/CD.
 
----
-
-## 📚 Documentation
-
-### Guides
-- 📖 [Guide d'installation](Docs/INSTALLATION.md)
-- 🔌 [Documentation API](Docs/API_DOCS.md)
-- 👥 [Guide utilisateur](Docs/USER_GUIDE.md)
-- 🎓 [Présentation soutenance](Docs/PRESENTATION_SOUTENANCE.md)
-
-### DevOps
-- 🛠️ [CI/CD Pipeline](Docs/CICD.md)
-- ☸️ [Déploiement Kubernetes](Docs/KUBERNETES_DEPLOYMENT.md)
-- 📈 [Monitoring](Docs/MONITORING.md)
-- 🧪 [Tests Performance & Sécurité](Docs/PERFORMANCE_SECURITY_TESTS.md)
-
-### 📊 Diagrammes UML
-
-| Diagramme | Description |
-|-----------|-------------|
-| [🏗️ Architecture](Docs/Diagramme%20d'Architecture.png) | Vue des composants du système |
-| [🚀 Déploiement](Docs/Diagramme%20de%20Déploiement.png) | Infrastructure Docker/Cloud |
-| [👤 Cas d'utilisation](Docs/Diagramme%20de%20Cas%20d'Utilisation.png) | Fonctionnalités utilisateur |
-| [📊 Classes](Docs/Diagramme%20de%20Classes%20(Modèles).png) | Modèles de données |
-| [🔐 Séquence Auth](Docs/Diagramme%20de%20Séquence%20-%20Authentification.png) | Flux d'authentification |
-| [🔔 Séquence Alerte](Docs/Diagramme%20de%20Séquence%20-%20Création%20d'Alerte.png) | Création et déclenchement |
-| [💱 Séquence Trading](Docs/Diagramme%20de%20Séquence%20-%20Trading%20Virtuel.png) | Simulation d'achat/vente |
-| [📊 Activité Trading](Docs/Diagramme%20d'Activité%20-%20Flux%20de%20Trading.png) | Flux de trading |
-| [🔄 État Alerte](Docs/Diagramme%20d'État%20-%20Cycle%20de%20Vie%20d'une%20Alerte.png) | Cycle de vie alerte |
-| [⚙️ CI/CD Pipeline](Docs/Diagramme%20CI-CD%20Pipeline.png) | Pipeline GitHub Actions |
-
----
-
-## 🧪 Tests
+## Tests
 
 ```bash
 # Tests backend
@@ -197,72 +117,39 @@ cd frontend && npm test
 # Tests de performance (Locust)
 locust -f tests/performance/locustfile_web.py --host=http://localhost:8000
 
-# Tests de sécurité
+# Tests de securite
 python tests/security/zap_scan.py --target http://localhost:8000
 ```
 
-### Types de tests
 | Type | Outils | Description |
-|------|--------|-------------|
-| **Unitaires** | pytest | API, Collector, Services |
-| **Intégration** | pytest + Docker | MongoDB, Redis |
-| **Performance** | Locust, k6 | Load testing, stress testing |
-| **Sécurité** | Trivy, Snyk, ZAP | Vulnérabilités, dépendances |
-| **E2E** | Playwright | Tests end-to-end |
+|---|---|---|
+| Unitaires | Pytest | API, collector, services |
+| Integration | Pytest + Docker | MongoDB, Redis |
+| Performance | Locust, k6 | Tests de charge et de stress |
+| Securite | Trivy, Snyk, OWASP ZAP | Vulnerabilites, dependances |
+| End-to-end | Playwright | Parcours utilisateur complets |
 
-- **Coverage** : ~75%
-- **Workflows CI/CD** : 12 (tests, build, security, performance, deploy)
+Couverture de tests : environ 75%, avec 12 workflows CI/CD (tests, build, securite, performance, deploiement).
 
----
+## Securite
 
-## 🛡️ Sécurité
+**Authentification et autorisation**
+JWT avec expiration des tokens (30 minutes), hachage des mots de passe (Argon2/Bcrypt), controle d'acces par role (utilisateur/administrateur).
 
-### Authentification & Autorisation
-- 🔐 **JWT** avec tokens expirants (30 min)
-- 🔒 **Hash mots de passe** Argon2/Bcrypt
-- 👥 **Rôles** : User et Admin avec guards
+**Protection des donnees**
+Validation des entrees via Pydantic, configuration stricte de CORS, secrets geres via variables d'environnement (non commitees).
 
-### Protection des données
-- ✅ **Validation** avec Pydantic
-- 🌐 **CORS** configuré strictement
-- 🚫 **Secrets** en variables d'environnement
+**Tests de securite automatises**
+Trivy pour le scan des images Docker, Snyk pour les vulnerabilites des dependances, OWASP ZAP pour les tests de penetration.
 
-### Tests de sécurité automatisés
-- 🔍 **Trivy** : Scan des images Docker
-- 📦 **Snyk** : Vulnérabilités des dépendances
-- 🕷️ **OWASP ZAP** : Tests de pénétration
+## Competences mobilisees
 
----
+Python, FastAPI, React, MongoDB, Redis, Celery, JWT, Argon2, Docker, Kubernetes, GitHub Actions, Prometheus, Grafana, Loki, Pytest, Playwright, Locust, OWASP ZAP, Trivy, Snyk, methodologie Agile, architecture microservices.
 
-## 🤝 Contribuer
+## Contact
 
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/nouvelle-fonction`)
-3. Commit (`git commit -m 'Ajout nouvelle fonction'`)
-4. Push (`git push origin feature/nouvelle-fonction`)
-5. Ouvrir une Pull Request
+Souhila Aicha Kebdani — kebdanisouhila218@gmail.com — Master 1 ILSEN, Universite d'Avignon, 2025/2026
 
----
+## Licence
 
-## 📞 Contact
-
-- **Nom** : Souhila Aicha Kebdani
-- **Email** : kebdanisouhila218@gmail.com
-- **GitHub** : [@kebdanisouhila218-beep](https://github.com/kebdanisouhila218-beep)
-- **Formation** : Master 1 ILSEN - 2025/2026
-
----
-
-## 📜 Licence
-
-Ce projet est sous licence **MIT** - voir le fichier [LICENSE](LICENSE) pour les détails.
-
----
-
-<div align="center">
-
-**Merci d'utiliser CryptoTracker ! 🚀**
-
-[⭐ Give a star](https://github.com/kebdanisouhila218-beep/cryptocurrency-monitoring-platform) | [🐛 Report a bug](issues) | [💡 Suggest a feature](issues)
-
-</div>
+Ce projet est sous licence MIT — voir le fichier [LICENSE](LICENSE).
